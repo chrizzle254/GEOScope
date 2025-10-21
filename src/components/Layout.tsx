@@ -1,9 +1,10 @@
 import { ReactNode } from 'react';
+import { Page } from '../types';
 
 interface LayoutProps {
   children: ReactNode;
-  currentPage: string;
-  onNavigate: (page: string) => void;
+  currentPage: Page;
+  onNavigate: (page: Page) => void;
   trialDaysRemaining: number | null;
   brandData: any;
 }

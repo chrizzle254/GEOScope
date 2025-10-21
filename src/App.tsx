@@ -6,8 +6,7 @@ import { Competitors } from './components/Competitors';
 import { ConvoContext } from './components/ConvoContext';
 import { Settings } from './components/Settings';
 import { Account } from './components/Account';
-
-type Page = 'home' | 'llm-comparison' | 'competitors' | 'convo-context' | 'settings' | 'account';
+import { Page } from './types';
 
 interface BrandData {
   brandName: string;
