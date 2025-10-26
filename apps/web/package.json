@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "type-check": "tsc -p tsconfig.json --noEmit",
     "test": "echo \"No tests specified\" && exit 0"
   },
@@ -59,6 +59,7 @@
     "@types/node": "^20.10.0",
     "@types/react": "^18.3.26",
     "@types/react-dom": "^18.3.7",
-    "typescript": "^5.5.0"
+    "typescript": "^5.5.0",
+    "eslint-config-next": "^15.0.0"
   }
 }
