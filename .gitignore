@@ -1,2 +1,9 @@
 # Dependencies
 apps/web/node_modules/
+apps/api/node_modules/
+node_modules
+apps/api/.next
+apps/api/out
+apps/web/.next
+apps/web/out
+.turbo
