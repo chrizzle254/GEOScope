@@ -1,0 +1,13 @@
+# Ignore artifacts and build outputs
+node_modules/
+.turbo/
+.next/
+dist/
+coverage/
+
+# App-specific build dirs
+apps/web/build/
+apps/api/dist/
+
+# Logs and caches
+*.log
