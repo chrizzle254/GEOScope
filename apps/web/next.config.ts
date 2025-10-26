@@ -3,7 +3,7 @@ import type { NextConfig } from 'next';
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   transpilePackages: [],
-  experimental: {}
+  experimental: {},
 };
 
 export default nextConfig;

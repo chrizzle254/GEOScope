@@ -9,14 +9,23 @@ interface LayoutProps {
   brandData: any;
 }
 
-export function Layout({ children, currentPage, onNavigate, trialDaysRemaining, brandData }: LayoutProps) {
+export function Layout({
+  children,
+  currentPage,
+  onNavigate,
+  trialDaysRemaining,
+  brandData,
+}: LayoutProps) {
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Header */}
       <header className="border-b border-[rgba(0,0,0,0.1)] px-[42px] py-[10px] flex items-center justify-between">
         <div className="flex items-center gap-4">
           <span className="text-[40px] leading-[1.5] tracking-[-0.76px]">🤖</span>
-          <span className="text-[24px] leading-[1.5] tracking-[-0.456px] font-medium" style={{ fontFamily: 'Roboto Mono, monospace' }}>
+          <span
+            className="text-[24px] leading-[1.5] tracking-[-0.456px] font-medium"
+            style={{ fontFamily: 'Roboto Mono, monospace' }}
+          >
             GEO Scope
           </span>
         </div>
@@ -26,7 +35,10 @@ export function Layout({ children, currentPage, onNavigate, trialDaysRemaining, 
               Trial: {trialDaysRemaining} days remaining
             </div>
           )}
-          <button className="px-6 py-2 border-2 border-[#1e1e1e] text-[#1e1e1e] rounded tracking-[-0.456px]" style={{ fontFamily: 'Roboto Mono, monospace' }}>
+          <button
+            className="px-6 py-2 border-2 border-[#1e1e1e] text-[#1e1e1e] rounded tracking-[-0.456px]"
+            style={{ fontFamily: 'Roboto Mono, monospace' }}
+          >
             Login
           </button>
           <div className="w-12 h-12 rounded-full bg-[#757575]" />
@@ -38,7 +50,10 @@ export function Layout({ children, currentPage, onNavigate, trialDaysRemaining, 
         <aside className="w-[275px] border-r border-[rgba(0,0,0,0.1)] p-[35px] pt-[126px]">
           <div className="space-y-8">
             <div>
-              <div className="text-[12px] tracking-[-0.132px] text-[#757575] mb-4" style={{ fontFamily: 'Roboto Mono, monospace', fontWeight: 700 }}>
+              <div
+                className="text-[12px] tracking-[-0.132px] text-[#757575] mb-4"
+                style={{ fontFamily: 'Roboto Mono, monospace', fontWeight: 700 }}
+              >
                 ANALYSIS
               </div>
               <nav className="space-y-2">
@@ -82,7 +97,10 @@ export function Layout({ children, currentPage, onNavigate, trialDaysRemaining, 
             </div>
 
             <div className="pt-64">
-              <div className="text-[12px] tracking-[-0.132px] text-[#757575] mb-4" style={{ fontFamily: 'Roboto Mono, monospace', fontWeight: 700 }}>
+              <div
+                className="text-[12px] tracking-[-0.132px] text-[#757575] mb-4"
+                style={{ fontFamily: 'Roboto Mono, monospace', fontWeight: 700 }}
+              >
                 CONFIG
               </div>
               <nav className="space-y-2">
@@ -110,9 +128,7 @@ export function Layout({ children, currentPage, onNavigate, trialDaysRemaining, 
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 p-8">
-          {children}
-        </main>
+        <main className="flex-1 p-8">{children}</main>
       </div>
     </div>
   );

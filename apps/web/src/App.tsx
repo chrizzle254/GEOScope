@@ -29,17 +29,14 @@ export default function App() {
   };
 
   return (
-    <Layout 
-      currentPage={currentPage} 
+    <Layout
+      currentPage={currentPage}
       onNavigate={setCurrentPage}
       trialDaysRemaining={trialDaysRemaining}
       brandData={brandData}
     >
       {currentPage === 'home' && (
-        <Dashboard 
-          brandData={brandData} 
-          onSetupComplete={handleBrandSetupComplete}
-        />
+        <Dashboard brandData={brandData} onSetupComplete={handleBrandSetupComplete} />
       )}
       {currentPage === 'llm-comparison' && <LLMComparison brandData={brandData} />}
       {currentPage === 'competitors' && <Competitors brandData={brandData} />}

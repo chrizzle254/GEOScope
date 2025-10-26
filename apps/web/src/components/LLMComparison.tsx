@@ -25,7 +25,7 @@ export function LLMComparison({ brandData }: LLMComparisonProps) {
       promptsTested: 3,
       avgPosition: 0,
       mentionRate: 0,
-      sentiment: { positive: 0, neutral: 0, negative: 0 }
+      sentiment: { positive: 0, neutral: 0, negative: 0 },
     },
     {
       name: 'Claude',
@@ -34,7 +34,7 @@ export function LLMComparison({ brandData }: LLMComparisonProps) {
       promptsTested: 3,
       avgPosition: 0,
       mentionRate: 0,
-      sentiment: { positive: 0, neutral: 0, negative: 0 }
+      sentiment: { positive: 0, neutral: 0, negative: 0 },
     },
     {
       name: 'Gemini',
@@ -43,7 +43,7 @@ export function LLMComparison({ brandData }: LLMComparisonProps) {
       promptsTested: 3,
       avgPosition: 0,
       mentionRate: 0,
-      sentiment: { positive: 0, neutral: 0, negative: 0 }
+      sentiment: { positive: 0, neutral: 0, negative: 0 },
     },
     {
       name: 'Perplexity',
@@ -52,22 +52,22 @@ export function LLMComparison({ brandData }: LLMComparisonProps) {
       promptsTested: 3,
       avgPosition: 0,
       mentionRate: 0,
-      sentiment: { positive: 0, neutral: 0, negative: 0 }
-    }
+      sentiment: { positive: 0, neutral: 0, negative: 0 },
+    },
   ];
 
   return (
     <div className="max-w-6xl">
       {/* Header */}
       <div className="mb-12">
-        <p 
-          className="text-[#1e1e1e] text-[40px] tracking-[-0.76px] mb-4" 
+        <p
+          className="text-[#1e1e1e] text-[40px] tracking-[-0.76px] mb-4"
           style={{ fontFamily: 'Roboto Mono, monospace', fontWeight: 700 }}
         >
           LLM Comparison
         </p>
-        <p 
-          className="text-[#757575] text-[20px] tracking-[-0.38px]" 
+        <p
+          className="text-[#757575] text-[20px] tracking-[-0.38px]"
           style={{ fontFamily: 'Roboto Mono, monospace', fontWeight: 500 }}
         >
           Compare your brand performance across AI platforms
@@ -101,8 +101,8 @@ export function LLMComparison({ brandData }: LLMComparisonProps) {
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
                 <div className="w-4 h-4 rounded-full" style={{ backgroundColor: llm.color }} />
-                <p 
-                  className="text-[#1e1e1e] text-[24px] tracking-[-0.456px]" 
+                <p
+                  className="text-[#1e1e1e] text-[24px] tracking-[-0.456px]"
                   style={{ fontFamily: 'Roboto Mono, monospace', fontWeight: 700 }}
                 >
                   {llm.name}
@@ -112,14 +112,14 @@ export function LLMComparison({ brandData }: LLMComparisonProps) {
 
             <div className="space-y-6">
               <div>
-                <p 
-                  className="text-[#757575] text-[12px] tracking-[-0.132px] mb-2" 
+                <p
+                  className="text-[#757575] text-[12px] tracking-[-0.132px] mb-2"
                   style={{ fontFamily: 'Roboto Mono, monospace', fontWeight: 700 }}
                 >
                   MENTIONS
                 </p>
-                <p 
-                  className="text-[#1e1e1e] text-[36px] tracking-[-0.684px]" 
+                <p
+                  className="text-[#1e1e1e] text-[36px] tracking-[-0.684px]"
                   style={{ fontFamily: 'Roboto Mono, monospace', fontWeight: 700 }}
                 >
                   {llm.mentions}
@@ -128,42 +128,42 @@ export function LLMComparison({ brandData }: LLMComparisonProps) {
 
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <p 
-                    className="text-[#757575] text-[12px] tracking-[-0.132px] mb-2" 
+                  <p
+                    className="text-[#757575] text-[12px] tracking-[-0.132px] mb-2"
                     style={{ fontFamily: 'Roboto Mono, monospace', fontWeight: 700 }}
                   >
                     PROMPTS
                   </p>
-                  <p 
-                    className="text-[#1e1e1e] text-[24px] tracking-[-0.456px]" 
+                  <p
+                    className="text-[#1e1e1e] text-[24px] tracking-[-0.456px]"
                     style={{ fontFamily: 'Roboto Mono, monospace', fontWeight: 700 }}
                   >
                     {llm.promptsTested}
                   </p>
                 </div>
                 <div>
-                  <p 
-                    className="text-[#757575] text-[12px] tracking-[-0.132px] mb-2" 
+                  <p
+                    className="text-[#757575] text-[12px] tracking-[-0.132px] mb-2"
                     style={{ fontFamily: 'Roboto Mono, monospace', fontWeight: 700 }}
                   >
                     AVG POS
                   </p>
-                  <p 
-                    className="text-[#1e1e1e] text-[24px] tracking-[-0.456px]" 
+                  <p
+                    className="text-[#1e1e1e] text-[24px] tracking-[-0.456px]"
                     style={{ fontFamily: 'Roboto Mono, monospace', fontWeight: 700 }}
                   >
                     {llm.avgPosition || '-'}
                   </p>
                 </div>
                 <div>
-                  <p 
-                    className="text-[#757575] text-[12px] tracking-[-0.132px] mb-2" 
+                  <p
+                    className="text-[#757575] text-[12px] tracking-[-0.132px] mb-2"
                     style={{ fontFamily: 'Roboto Mono, monospace', fontWeight: 700 }}
                   >
                     RATE
                   </p>
-                  <p 
-                    className="text-[#1e1e1e] text-[24px] tracking-[-0.456px]" 
+                  <p
+                    className="text-[#1e1e1e] text-[24px] tracking-[-0.456px]"
                     style={{ fontFamily: 'Roboto Mono, monospace', fontWeight: 700 }}
                   >
                     {llm.mentionRate}%
@@ -172,22 +172,31 @@ export function LLMComparison({ brandData }: LLMComparisonProps) {
               </div>
 
               <div>
-                <p 
-                  className="text-[#757575] text-[12px] tracking-[-0.132px] mb-3" 
+                <p
+                  className="text-[#757575] text-[12px] tracking-[-0.132px] mb-3"
                   style={{ fontFamily: 'Roboto Mono, monospace', fontWeight: 700 }}
                 >
                   SENTIMENT
                 </p>
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between text-[14px]" style={{ fontFamily: 'Roboto Mono, monospace' }}>
+                  <div
+                    className="flex items-center justify-between text-[14px]"
+                    style={{ fontFamily: 'Roboto Mono, monospace' }}
+                  >
                     <span className="text-[#10a37f]">Positive</span>
                     <span className="text-[#1e1e1e]">{llm.sentiment.positive}%</span>
                   </div>
-                  <div className="flex items-center justify-between text-[14px]" style={{ fontFamily: 'Roboto Mono, monospace' }}>
+                  <div
+                    className="flex items-center justify-between text-[14px]"
+                    style={{ fontFamily: 'Roboto Mono, monospace' }}
+                  >
                     <span className="text-[#757575]">Neutral</span>
                     <span className="text-[#1e1e1e]">{llm.sentiment.neutral}%</span>
                   </div>
-                  <div className="flex items-center justify-between text-[14px]" style={{ fontFamily: 'Roboto Mono, monospace' }}>
+                  <div
+                    className="flex items-center justify-between text-[14px]"
+                    style={{ fontFamily: 'Roboto Mono, monospace' }}
+                  >
                     <span className="text-[#d97757]">Negative</span>
                     <span className="text-[#1e1e1e]">{llm.sentiment.negative}%</span>
                   </div>
@@ -200,33 +209,51 @@ export function LLMComparison({ brandData }: LLMComparisonProps) {
 
       {/* Detailed Comparison Table */}
       <div className="border-2 border-[#1e1e1e] rounded-lg p-8">
-        <p 
-          className="text-[#1e1e1e] text-[24px] tracking-[-0.456px] mb-6" 
+        <p
+          className="text-[#1e1e1e] text-[24px] tracking-[-0.456px] mb-6"
           style={{ fontFamily: 'Roboto Mono, monospace', fontWeight: 700 }}
         >
           Detailed Metrics
         </p>
-        
+
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="border-b-2 border-[#1e1e1e]">
-                <th className="text-left py-4 px-4 text-[#757575] text-[12px]" style={{ fontFamily: 'Roboto Mono, monospace', fontWeight: 700 }}>
+                <th
+                  className="text-left py-4 px-4 text-[#757575] text-[12px]"
+                  style={{ fontFamily: 'Roboto Mono, monospace', fontWeight: 700 }}
+                >
                   LLM
                 </th>
-                <th className="text-right py-4 px-4 text-[#757575] text-[12px]" style={{ fontFamily: 'Roboto Mono, monospace', fontWeight: 700 }}>
+                <th
+                  className="text-right py-4 px-4 text-[#757575] text-[12px]"
+                  style={{ fontFamily: 'Roboto Mono, monospace', fontWeight: 700 }}
+                >
                   MENTIONS
                 </th>
-                <th className="text-right py-4 px-4 text-[#757575] text-[12px]" style={{ fontFamily: 'Roboto Mono, monospace', fontWeight: 700 }}>
+                <th
+                  className="text-right py-4 px-4 text-[#757575] text-[12px]"
+                  style={{ fontFamily: 'Roboto Mono, monospace', fontWeight: 700 }}
+                >
                   PROMPTS
                 </th>
-                <th className="text-right py-4 px-4 text-[#757575] text-[12px]" style={{ fontFamily: 'Roboto Mono, monospace', fontWeight: 700 }}>
+                <th
+                  className="text-right py-4 px-4 text-[#757575] text-[12px]"
+                  style={{ fontFamily: 'Roboto Mono, monospace', fontWeight: 700 }}
+                >
                   RATE
                 </th>
-                <th className="text-right py-4 px-4 text-[#757575] text-[12px]" style={{ fontFamily: 'Roboto Mono, monospace', fontWeight: 700 }}>
+                <th
+                  className="text-right py-4 px-4 text-[#757575] text-[12px]"
+                  style={{ fontFamily: 'Roboto Mono, monospace', fontWeight: 700 }}
+                >
                   AVG POS
                 </th>
-                <th className="text-right py-4 px-4 text-[#757575] text-[12px]" style={{ fontFamily: 'Roboto Mono, monospace', fontWeight: 700 }}>
+                <th
+                  className="text-right py-4 px-4 text-[#757575] text-[12px]"
+                  style={{ fontFamily: 'Roboto Mono, monospace', fontWeight: 700 }}
+                >
                   POSITIVE
                 </th>
               </tr>
@@ -236,25 +263,46 @@ export function LLMComparison({ brandData }: LLMComparisonProps) {
                 <tr key={llm.name} className="border-b border-[#d9d9d9]">
                   <td className="py-4 px-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: llm.color }} />
-                      <span className="text-[#1e1e1e] text-[16px]" style={{ fontFamily: 'Roboto Mono, monospace', fontWeight: 500 }}>
+                      <div
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: llm.color }}
+                      />
+                      <span
+                        className="text-[#1e1e1e] text-[16px]"
+                        style={{ fontFamily: 'Roboto Mono, monospace', fontWeight: 500 }}
+                      >
                         {llm.name}
                       </span>
                     </div>
                   </td>
-                  <td className="text-right py-4 px-4 text-[#1e1e1e] text-[16px]" style={{ fontFamily: 'Roboto Mono, monospace', fontWeight: 700 }}>
+                  <td
+                    className="text-right py-4 px-4 text-[#1e1e1e] text-[16px]"
+                    style={{ fontFamily: 'Roboto Mono, monospace', fontWeight: 700 }}
+                  >
                     {llm.mentions}
                   </td>
-                  <td className="text-right py-4 px-4 text-[#1e1e1e] text-[16px]" style={{ fontFamily: 'Roboto Mono, monospace', fontWeight: 500 }}>
+                  <td
+                    className="text-right py-4 px-4 text-[#1e1e1e] text-[16px]"
+                    style={{ fontFamily: 'Roboto Mono, monospace', fontWeight: 500 }}
+                  >
                     {llm.promptsTested}
                   </td>
-                  <td className="text-right py-4 px-4 text-[#1e1e1e] text-[16px]" style={{ fontFamily: 'Roboto Mono, monospace', fontWeight: 500 }}>
+                  <td
+                    className="text-right py-4 px-4 text-[#1e1e1e] text-[16px]"
+                    style={{ fontFamily: 'Roboto Mono, monospace', fontWeight: 500 }}
+                  >
                     {llm.mentionRate}%
                   </td>
-                  <td className="text-right py-4 px-4 text-[#1e1e1e] text-[16px]" style={{ fontFamily: 'Roboto Mono, monospace', fontWeight: 500 }}>
+                  <td
+                    className="text-right py-4 px-4 text-[#1e1e1e] text-[16px]"
+                    style={{ fontFamily: 'Roboto Mono, monospace', fontWeight: 500 }}
+                  >
                     {llm.avgPosition || '-'}
                   </td>
-                  <td className="text-right py-4 px-4 text-[#10a37f] text-[16px]" style={{ fontFamily: 'Roboto Mono, monospace', fontWeight: 500 }}>
+                  <td
+                    className="text-right py-4 px-4 text-[#10a37f] text-[16px]"
+                    style={{ fontFamily: 'Roboto Mono, monospace', fontWeight: 500 }}
+                  >
                     {llm.sentiment.positive}%
                   </td>
                 </tr>
