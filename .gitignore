@@ -8,3 +8,18 @@ apps/web/.next
 apps/web/out
 .turbo
 .continue
+
+# Environment files (never commit real env)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+apps/*/.env
+apps/*/.env.local
+apps/*/.env.development
+apps/*/.env.test
+apps/*/.env.production
+apps/*/.env.development.local
+apps/*/.env.test.local
+apps/*/.env.production.local
