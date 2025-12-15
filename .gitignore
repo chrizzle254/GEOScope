@@ -23,3 +23,6 @@ apps/*/.env.production
 apps/*/.env.development.local
 apps/*/.env.test.local
 apps/*/.env.production.local
+
+# DB
+supabase/.temp
