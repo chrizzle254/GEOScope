@@ -5,11 +5,3 @@ create table public.organizations (
   created_at timestamptz default now()
 );
 
-alter table public.organizations enable row level security;
-
-create policy "Authenticated users can create organizations"
-  on public.organizations for insert
-  with check (
-    auth.role() = 'authenticated'
-  );
-
