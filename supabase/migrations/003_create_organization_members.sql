@@ -23,3 +23,28 @@ create policy "Owners/admins can manage organization members"
     )
   );
 
+-- Policies for organizations that depend on organization_members
+create policy "Organization members can view their organization"
+  on public.organizations for select
+  using (
+    id in (
+      select organization_id from public.organization_members where user_id = auth.uid()
+    )
+  );
+
+create policy "Organization owners/admins can update their organization"
+  on public.organizations for update
+  using (
+    id in (
+      select organization_id from public.organization_members where user_id = auth.uid() and role in ('owner', 'admin')
+    )
+  );
+
+create policy "Organization owners can delete their organization"
+  on public.organizations for delete
+  using (
+    id in (
+      select organization_id from public.organization_members where user_id = auth.uid() and role = 'owner'
+    )
+  );
+
