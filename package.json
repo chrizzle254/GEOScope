@@ -12,7 +12,6 @@
     "supabase:reset": "supabase db reset",
     "supabase:status": "supabase status",
     "supabase:push": "supabase db push",
-
     "dev:web": "turbo run dev --filter=web",
     "dev:api": "turbo run dev --filter=api",
     "dev": "turbo run dev --parallel --filter=web --filter=api",
