@@ -116,9 +116,7 @@ export function AuthForm() {
         </div>
 
         {error && (
-          <div className="p-3 bg-red-50 border-2 border-red-500 rounded text-red-700">
-            {error}
-          </div>
+          <div className="p-3 bg-red-50 border-2 border-red-500 rounded text-red-700">{error}</div>
         )}
 
         <button
