@@ -1,4 +1,8 @@
+import { useAuth } from '../contexts/AuthContext';
+
 export function Account() {
+  const { user } = useAuth();
+
   return (
     <div className="max-w-4xl">
       <p
@@ -23,8 +27,9 @@ export function Account() {
         </p>
         <input
           type="email"
-          defaultValue="user@example.com"
-          className="w-full max-w-md px-6 py-4 border-2 border-[#1e1e1e] rounded text-[20px] tracking-[-0.38px]"
+          value={user?.email || ''}
+          disabled
+          className="w-full max-w-md px-6 py-4 border-2 border-[#1e1e1e] rounded text-[20px] tracking-[-0.38px] bg-gray-50"
           style={{ fontFamily: 'Roboto Mono, monospace', fontWeight: 500 }}
         />
       </div>
