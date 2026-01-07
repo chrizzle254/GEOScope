@@ -1,4 +1,6 @@
 import { ReactNode } from 'react';
+import { useRouter } from 'next/router';
+import { useAuth } from '../contexts/AuthContext';
 import { Page } from '../types';
 
 interface LayoutProps {
@@ -16,6 +18,9 @@ export function Layout({
   trialDaysRemaining,
   brandData,
 }: LayoutProps) {
+  const { user, signOut } = useAuth();
+  const router = useRouter();
+
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Header */}
@@ -35,12 +40,31 @@ export function Layout({
               Trial: {trialDaysRemaining} days remaining
             </div>
           )}
-          <button
-            className="px-6 py-2 border-2 border-[#1e1e1e] text-[#1e1e1e] rounded tracking-[-0.456px]"
-            style={{ fontFamily: 'Roboto Mono, monospace' }}
-          >
-            Login
-          </button>
+          {user ? (
+            <>
+              <span
+                className="text-sm text-[#757575]"
+                style={{ fontFamily: 'Roboto Mono, monospace' }}
+              >
+                {user.email}
+              </span>
+              <button
+                onClick={signOut}
+                className="px-6 py-2 border-2 border-[#1e1e1e] text-[#1e1e1e] rounded tracking-[-0.456px] hover:bg-[#1e1e1e] hover:text-white transition-colors"
+                style={{ fontFamily: 'Roboto Mono, monospace' }}
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={() => router.push('/login')}
+              className="px-6 py-2 border-2 border-[#1e1e1e] text-[#1e1e1e] rounded tracking-[-0.456px] hover:bg-[#1e1e1e] hover:text-white transition-colors"
+              style={{ fontFamily: 'Roboto Mono, monospace' }}
+            >
+              Login
+            </button>
+          )}
           <div className="w-12 h-12 rounded-full bg-[#757575]" />
         </div>
       </header>
