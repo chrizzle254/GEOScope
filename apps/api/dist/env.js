@@ -12,5 +12,6 @@ dotenv.config({ path: `.env.${nodeEnv}.local`, override: true });
 export const env = cleanEnv(process.env, {
     PORT: num({ default: 4000 }),
     SUPABASE_URL: str(),
+    SUPABASE_ANON_KEY: str(),
     SUPABASE_SERVICE_ROLE_KEY: str(),
 });
