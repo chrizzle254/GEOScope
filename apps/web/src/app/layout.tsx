@@ -5,7 +5,10 @@ export const metadata = {
   description: 'Basic setup for API and Supabase communication testing',
 };
 
-export default () => {
-  return 
-    <div>test</div>
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  );
 }
