@@ -9,12 +9,18 @@ export default function HomePage() {
       </p>
       <div className="flex gap-4">
         {/* Corrected Route */}
-        <Link href="/dashboard" className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+        <Link
+          href="/dashboard"
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
           Go to Dashboard
         </Link>
-        
+
         {/* Corrected Route Group Link */}
-        <Link href="/login" className="px-4 py-2 border border-blue-500 text-blue-500 rounded hover:bg-blue-50">
+        <Link
+          href="/login"
+          className="px-4 py-2 border border-blue-500 text-blue-500 rounded hover:bg-blue-50"
+        >
           Login
         </Link>
       </div>
