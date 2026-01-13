@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { env } from '../env';
 // Create Supabase client with anon key for JWT verification
-const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY);
+const supabase = createClient(env.SUPABASE_URL, env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY);
 export async function authenticateUser(req, res, next) {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {

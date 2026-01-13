@@ -30,7 +30,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "../../packages/shared/src/**/*.ts",
-    "middleware.ts"
+    "proxy.ts"
   ],
   "exclude": ["node_modules"]
 }
