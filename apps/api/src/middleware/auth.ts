@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { env } from '../env';
 
 // Create Supabase client with anon key for JWT verification
-const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY);
+const supabase = createClient(env.SUPABASE_URL, env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY);
 
 // Extend Express Request type to include user
 declare module 'express-serve-static-core' {

@@ -10,7 +10,7 @@ app.use(express.json());
 const getScopedClient = (req) => {
     const authHeader = req.headers.authorization;
     const token = authHeader?.split(' ')[1];
-    return createClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY, {
+    return createClient(env.SUPABASE_URL, env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY, {
         global: { headers: { Authorization: `Bearer ${token}` } },
     });
 };
