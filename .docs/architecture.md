@@ -1,9 +1,11 @@
 # Architecture Spec: GEO Scope
 
 ## 1. System Overview
+
 GEO Scope is a specialized SaaS platform built on a Turborepo monorepo architecture. It separates the high-velocity UI/Frontend from the long-running, resource-intensive LLM Sampling Engine.
 
 ## 2. Tech Stack
+
 - **Monorepo:** Turborepo with npm workspaces.
 - **Frontend (`apps/web`):** Next.js 15 (App Router), React 19, TypeScript.
 - **Backend (`apps/api`):** Node.js with Express, TypeScript.
@@ -24,6 +26,7 @@ GEO Scope is a specialized SaaS platform built on a Turborepo monorepo architect
 ## 4. Directory Structure
 
 ### 4.1 Frontend (`apps/web`)
+
 ```text
 web/
 ├── src/
@@ -31,10 +34,10 @@ web/
 │   │   ├── (auth)/         # Auth route group
 │   │   ├── dashboard/      # Main application UI
 │   │   └── api/            # Local Next.js route handlers
-│   ├── components/         
+│   ├── components/
 │   │   ├── ui/             # Shadcn primitives
 │   │   └── shared/         # Feature components (BrandForm, Charts)
-│   ├── lib/                
+│   ├── lib/
 │   │   ├── supabase/       # Client, Server, and Middleware configs
 │   │   └── stripe.ts       # Frontend Stripe elements config
 │   ├── services/           # Logic for hitting the Express API
@@ -57,23 +60,22 @@ api/
 
 ## 5. Initial Data Schema
 
-* **`profiles`:** Links to `auth.users`. Stores `stripe_customer_id` and subscription status.
-* **`brands`:** Stores brand names and competitor metadata owned by a `profile_id`.
-* **`analyses`:** Logs an analysis attempt, its status (`pending`, `processing`, `completed`), and timestamps.
-* **`analysis_results`:** The core data table. Stores `llm_provider`, `sentiment_score`, `mention_count`, and the `raw_response` (JSONB).
+- **`profiles`:** Links to `auth.users`. Stores `stripe_customer_id` and subscription status.
+- **`brands`:** Stores brand names and competitor metadata owned by a `profile_id`.
+- **`analyses`:** Logs an analysis attempt, its status (`pending`, `processing`, `completed`), and timestamps.
+- **`analysis_results`:** The core data table. Stores `llm_provider`, `sentiment_score`, `mention_count`, and the `raw_response` (JSONB).
 
 ## 6. Security & Infrastructure
 
-* **JWT Verification:** `apps/api` must verify the Supabase JWT in the `Authorization` header for all protected routes.
-* **Hosting:** - **Web:** Vercel (Edge-optimized).
-* **API:** Render/Railway (Persistent Node.js environment to prevent LLM timeout).
-* **DB:** Supabase (Postgres).
+- **JWT Verification:** `apps/api` must verify the Supabase JWT in the `Authorization` header for all protected routes.
+- **Hosting:** - **Web:** Vercel (Edge-optimized).
+- **API:** Render/Railway (Persistent Node.js environment to prevent LLM timeout).
+- **DB:** Supabase (Postgres).
 
-
-* **Environment Variables:** Must be mirrored in `.env.example` at the root and within respective app folders.
+- **Environment Variables:** Must be mirrored in `.env.example` at the root and within respective app folders.
 
 ## 7. Development Guidelines for AI Agent
 
-* **Logic Placement:** Do not put LLM sampling logic in Next.js Server Actions; it belongs in `apps/api` to ensure process longevity.
-* **Type Safety:** Prioritize shared types if a definition is used across both `web` and `api`.
-* **UI Consistency:** Always reference `@style-guide.md` and use `shadcn/ui` primitives located in `apps/web/src/components/ui`.
+- **Logic Placement:** Do not put LLM sampling logic in Next.js Server Actions; it belongs in `apps/api` to ensure process longevity.
+- **Type Safety:** Prioritize shared types if a definition is used across both `web` and `api`.
+- **UI Consistency:** Always reference `@style-guide.md` and use `shadcn/ui` primitives located in `apps/web/src/components/ui`.
