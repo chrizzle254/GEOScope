@@ -61,9 +61,10 @@ api/
 ## 5. Initial Data Schema
 
 - **`profiles`:** Links to `auth.users`. Stores `stripe_customer_id` and subscription status.
-- **`brands`:** Stores brand names and competitor metadata owned by a `profile_id`.
-- **`analyses`:** Logs an analysis attempt, its status (`pending`, `processing`, `completed`), and timestamps.
-- **`analysis_results`:** The core data table. Stores `llm_provider`, `sentiment_score`, `mention_count`, and the `raw_response` (JSONB).
+- **`reporting_subject`:** Stores brand names and competitor metadata owned by a `profile_id`.
+- **`analysis_runs`:** Logs an analysis attempt, its status (`pending`, `processing`, `completed`), and timestamps.
+- **`mentions`:** Stores individual data points from each LLM sample. Fields: analysis_run_id, provider_id, sentiment (enum), accurate (boolean), and excerpt (text).
+- **`reporting_subject_metrics`:** Stores the aggregated results for a specific run. Fields: analysis_run_id, visibility_score, accuracy_rate, and sentiment_score.
 
 ## 6. Security & Infrastructure
 
