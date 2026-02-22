@@ -1,22 +1,25 @@
 import { Request, Response, NextFunction } from 'express';
-import { createClient } from '@supabase/supabase-js';
+import jwt from 'jsonwebtoken';
 import { env } from '../env';
 
-// Create Supabase client with anon key for JWT verification
-const supabase = createClient(env.SUPABASE_URL, env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY);
-
-// Extend Express Request type to include user
+// Extend Express Request type to include the decoded user payload
 declare module 'express-serve-static-core' {
   interface Request {
     user?: {
-      id: string;
-      email?: string;
-      role?: string;
+      id: string; // 'sub' claim from the JWT
+      role: string;
+      // Add other properties from your JWT payload as needed
     };
   }
 }
 
-export async function authenticateUser(req: Request, res: Response, next: NextFunction) {
+interface JwtPayload {
+  sub: string;
+  role: string;
+  // Add other properties from your JWT payload as needed
+}
+
+export function authenticateUser(req: Request, res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -26,30 +29,23 @@ export async function authenticateUser(req: Request, res: Response, next: NextFu
   const token = authHeader.split(' ')[1];
 
   try {
-    // Verify JWT and get user
-    const {
-      data: { user },
-      error,
-    } = await supabase.auth.getUser(token);
+    // Verify the token using the secret
+    const decoded = jwt.verify(token, env.SUPABASE_JWT_SECRET) as JwtPayload;
 
-    if (error || !user) {
-      return res.status(401).json({ error: 'Invalid or expired token' });
-    }
-
-    // Attach user to request
+    // Attach user payload to request. The user ID is in the 'sub' claim.
     req.user = {
-      id: user.id,
-      email: user.email,
-      role: user.role,
+      id: decoded.sub,
+      role: decoded.role,
     };
 
     next();
   } catch (error) {
-    return res.status(401).json({ error: 'Authentication failed: ' + error });
+    // This will catch errors like expired tokens or invalid signatures
+    return res.status(401).json({ error: 'Authentication failed: Invalid or expired token' });
   }
 }
 
-// Optional: Middleware to check if user has specific role
+// This optional middleware can remain as is, it's still useful.
 export function requireRole(...roles: string[]) {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
