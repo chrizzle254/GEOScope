@@ -23,8 +23,9 @@
 #### **Phase 1: Brand Management & API Integration (Refocused)**
 
 - [x] **Express API: JWT Verification Middleware**
-- [ ] **Database Seeding (Development Anchor)**
+- [x] **Database Seeding (Development Anchor)**
   - Manually seed `organizations`, `reporting_subject`, and `reporting_subjectcompetitors`.
+  - **Session Note:** Added idempotent seed data for `organizations`, `reporting_subject`, and `reporting_subject_competitors` to `supabase/seed.sql` to support brand endpoint development.
 - [ ] **Express API: Brand Endpoints**
   - Create `POST /brands` and `GET /brands` in `apps/api/src/controllers/brandController.ts`.
   - Map to `public.reporting_subject` and `public.reporting_subjectcompetitors`.
