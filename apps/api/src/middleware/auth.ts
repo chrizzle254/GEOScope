@@ -41,7 +41,9 @@ export function authenticateUser(req: Request, res: Response, next: NextFunction
     next();
   } catch (error) {
     // This will catch errors like expired tokens or invalid signatures
-    return res.status(401).json({ error: 'Authentication failed: Invalid or expired token' });
+    return res
+      .status(401)
+      .json({ error: 'Authentication failed: Invalid or expired token. ' + error });
   }
 }
 
