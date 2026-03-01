@@ -3,7 +3,7 @@ insert into auth.users (id, email, encrypted_password, role, created_at)
 values (
   '00000000-0000-0000-0000-000000000001',
   'jeffrey@example.com',
-  'fakehashedpassword',  -- you can use gen_salt() / hash later
+  '$2a$10$g8aFln7j0IALzUGWzulKzut1UEOeUFmxl/C3fUEbDmfbD8o.RSa3O',  -- pw to enter: 123456 
   'authenticated',
   now()
 );
@@ -42,7 +42,7 @@ WITH subject AS (
     WHERE name = 'Acme Website Builder'
     AND organization_id = (SELECT id FROM public.organizations WHERE name = 'Acme Inc.')
 )
-INSERT INTO public.reporting_subjectcompetitors (reporting_subject_id, name)
+INSERT INTO public.reporting_subject_competitors (reporting_subject_id, name)
 SELECT id, 'Webflow' FROM subject
 UNION ALL
 SELECT id, 'Framer' FROM subject
