@@ -5,78 +5,75 @@
 #### **Phase 0: Foundation (Completed)**
 
 - [x] **Project Scaffolding**
-- [x] CI/CD gitpipeline
-- [x] Initial monorepo layout (Turborepo)
-- [x] Tool configuration (Turbo, Prettier, ESLint)
-- [x] Readme + Scripts
-- [x] Env management
-
+  - [x] CI/CD gitpipeline
+  - [x] Initial monorepo layout (Turborepo)
+  - [x] Tool configuration (Turbo, Prettier, ESLint)
+  - [x] Readme + Scripts
+  - [x] Env management
 - [x] **Supabase Setup**
-- [x] Project setup
-- [x] RLS setup
-- [x] Setup DB schema (with migration files)
-
+  - [x] Project setup
+  - [x] RLS setup
+  - [x] Setup DB schema (with migration files)
 - [x] **Auth**
-- [x] Protect routes with middleware
-- [x] Add auth routes (login, register, reset passwords)
+  - [x] Protect routes with middleware
+  - [x] Add auth routes (login, register, reset passwords)
 
 ---
 
-#### **Phase 1: Brand Management & API Integration**
+#### **Phase 1: Brand Management & API Integration (Refocused)**
 
-- [ ] **Express API: JWT Verification Middleware**
-- Implement `apps/api/src/middleware/auth.ts` to validate Supabase JWTs.
-- Use `jsonwebtoken` or `jose` to verify headers from `apps/web`.
-
+- [x] **Express API: JWT Verification Middleware**
+- [x] **Database Seeding (Development Anchor)**
+  - Manually seed `organizations`, `reporting_subject`, and `reporting_subject_competitors`.
+  - **Session Note:** Added idempotent seed data for `organizations`, `reporting_subject`, and `reporting_subject_competitors` to `supabase/seed.sql` to support brand endpoint development.
 - [ ] **Express API: Brand Endpoints**
-- Create `POST /brands` and `GET /brands` in `apps/api/src/controllers/brandController.ts`.
-- Map to `public.brands` (or `reporting_subject`) table via Supabase Service Role.
+  - Create `POST /brands` and `GET /brands` in `apps/api/src/controllers/brandController.ts`.
+  - Map to `public.reporting_subject` and `public.reporting_subject_competitors`.
 
-- [ ] **Frontend: Brand Configuration UI**
-- Build `BrandForm` in `apps/web/src/components/shared/` using `shadcn/ui`.
-- Integrate form with `apps/web/src/services/` to communicate with Express API.
+---
 
-#### **Phase 2: LLM Sampling Engine (Core Logic)**
+#### **Phase 2: LLM Sampling Engine (Blind Share-of-Voice)**
 
 - [ ] **Express API: Orchestration Service**
-- Implement `apps/api/src/services/samplingEngine.ts` using **Vercel AI SDK**.
-- **Constraint:** Logic must remain in Express to avoid Vercel Serverless timeouts.
-- Support OpenAI (GPT-4o), Anthropic (Claude 3.5), and Google Gemini 1.5.
+  - Implement `apps/api/src/services/samplingEngine.ts`.
+  - Support **GPT-5.2**, **Claude 4.6**, and **Gemini 3.1**.
+- [ ] **The "Blind" Prompt Library**
+  - Create `apps/api/src/lib/prompts.ts` with ~100 industry-specific questions.
+  - **Rule:** These prompts must NOT mention the User's Brand.
+- [ ] **Mention Extraction Parser**
+  - Build a regex or LLM-based utility to scan raw responses for `reporting_subject.name` and `competitors.name`.
+- [ ] **Data Persistence**
+  - Record `mentions`: Was the brand present? (Boolean)
+  - Record `sentiment`: How was the brand described? (Post-analysis only)
+  - Update `reporting_subject_metrics` for Share of Voice (SoV) calculation.
 
-- [ ] **Prompt Library & Generation**
-- Create system-managed prompt templates (~100 samples) in `apps/api/src/lib/prompts.ts`.
-- Simulate realistic user queries (e.g., "What is the best [industry] tool?").
-
-- [ ] **Data Extraction & Persistence**
-- Implement parser to extract brand mentions, competitor mentions, and sentiment.
-- Save structured logs to `public.analyses` and `public.analysis_results`.
+---
 
 #### **Phase 3: Dashboard & Visualization**
 
+- [ ] **Frontend: Brand Configuration UI**
+  - Build `BrandForm` in `apps/web/src/components/shared/` using `shadcn/ui`.
 - [ ] **Dashboard Layout**
-- Implement responsive grid in `apps/web/src/app/dashboard/page.tsx`.
-
+  - Implement responsive grid in `apps/web/src/app/dashboard/page.tsx`.
 - [ ] **Data Visualization**
-- Create **Visibility Score** and **Sentiment Trend** components using `Recharts`.
-- Display comparative ranking against competitors.
-
+  - Create **Visibility Score** and **Sentiment Trend** components using `Recharts`.
 - [ ] **Accuracy/Hallucination Reporting**
-- Build UI to highlight factual inaccuracies detected during LLM sampling.
+  - UI to highlight factual inaccuracies detected by GPT-5.2/Gemini 3.1 reasoning.
+
+---
 
 #### **Phase 4: Billing & Payments**
 
 - [ ] **Stripe Integration**
-- Set up Stripe Webhooks in `apps/api/src/controllers/billingController.ts`.
-- Sync subscription status to `profiles` or `billing.subscriptions` table.
-
+  - Set up Stripe Webhooks in `apps/api/src/controllers/billingController.ts`.
 - [ ] **Access Control Middleware**
-- Add backend middleware to block analysis triggers if a valid subscription is missing.
+  - Backend middleware to block analysis if a valid subscription is missing.
+
+---
 
 #### **Phase 5: Exports & Maintenance**
 
 - [ ] **Export Service**
-- Implement PDF/CSV generation in `apps/api/src/services/reportService.ts`.
-- Upload to Supabase Storage with signed URL access.
-
+  - Implement PDF/CSV generation in `apps/api/src/services/reportService.ts`.
 - [ ] **Automated Scheduler**
-- Set up cron job (via GitHub Actions or Node-cron) to trigger periodic re-analysis.
+  - Set up cron job to trigger periodic re-analysis.

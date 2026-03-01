@@ -1,44 +1,40 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import { env } from './env';
-import { createClient } from '@supabase/supabase-js';
 import { authenticateUser } from './middleware/auth';
+import { getBrands, createBrand } from './controllers/brandController';
+import { supabase } from './lib/supabase';
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Helper to get a Supabase client that respects the specific user's RLS
-const getScopedClient = (req: Request) => {
-  const authHeader = req.headers.authorization;
-  const token = authHeader?.split(' ')[1];
-
-  return createClient(env.SUPABASE_URL, env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY, {
-    global: { headers: { Authorization: `Bearer ${token}` } },
-  });
-};
-
-// Admin client - Keep this internal, NEVER use in standard user flows unless forced
-const supabaseAdmin = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_ROLE_KEY);
-
 app.get('/health', (_req: Request, res: Response) => {
   res.json({ status: 'ok' });
 });
 
+// --- Brand Routes ---
+app.get('/brands', authenticateUser, getBrands);
+app.post('/brands', authenticateUser, createBrand);
+// --- End Brand Routes ---
+
 // Protected: Get current user profile
 app.get('/users/me', authenticateUser, async (req, res) => {
   try {
-    const client = getScopedClient(req);
-    const { data, error } = await client
+    const { data, error } = await supabase
       .from('users')
       .select('*')
-      .eq('auth_id', req.user!.id)
+      .eq('auth_id', req.user!.auth_id) // Correctly use auth_id
       .single();
 
-    if (error) return res.status(404).json({ error: 'User not found' });
+    if (error) {
+      console.error('[GET /users/me] Supabase Error:', error);
+      return res.status(404).json({ error: 'User not found' });
+    }
     res.json({ data });
   } catch (err) {
-    res.status(500).json({ error: 'Internal server error: ' + err });
+    console.error('[GET /users] Error:', err);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
@@ -46,7 +42,7 @@ app.get('/users/me', authenticateUser, async (req, res) => {
 app.get('/users', authenticateUser, async (req, res) => {
   try {
     // 1. Check if the requester is actually an admin in your 'users' table
-    const { data: adminUser } = await supabaseAdmin
+    const { data: adminUser } = await supabase
       .from('users')
       .select('role')
       .eq('auth_id', req.user!.id)
@@ -57,12 +53,13 @@ app.get('/users', authenticateUser, async (req, res) => {
     }
 
     // 2. Use admin client to fetch all (bypassing RLS)
-    const { data, error } = await supabaseAdmin.from('users').select('*');
+    const { data, error } = await supabase.from('users').select('*');
 
     if (error) throw error;
     res.json({ data });
   } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch users: ' + err });
+    console.error('[GET /users] Error:', err);
+    res.status(500).json({ error: 'Failed to fetch users' });
   }
 });
 
@@ -72,10 +69,8 @@ app.post('/organizations', authenticateUser, async (req, res) => {
   if (!name) return res.status(400).json({ error: 'Name required' });
 
   try {
-    const client = getScopedClient(req);
-
-    // Get the internal UUID for the user
-    const { data: userData } = await client
+    // Get the internal UUID for the user from our public.users table
+    const { data: userData } = await supabase
       .from('users')
       .select('id')
       .eq('auth_id', req.user!.id)
@@ -83,9 +78,8 @@ app.post('/organizations', authenticateUser, async (req, res) => {
 
     if (!userData) return res.status(404).json({ error: 'User record missing' });
 
-    // Using an RPC call here is the "Bro" way to ensure atomicity (both happen or neither)
-    // You'll need to create this function in Supabase SQL editor
-    const { data, error } = await client.rpc('create_organization_with_owner', {
+    // This RPC creates the org and sets the creator as owner in organization_members
+    const { data, error } = await supabase.rpc('create_organization_with_owner', {
       org_name: name,
       user_id: userData.id,
     });
@@ -94,7 +88,8 @@ app.post('/organizations', authenticateUser, async (req, res) => {
 
     res.status(201).json({ data });
   } catch (err) {
-    res.status(500).json({ error: 'Internal server error: ' + err });
+    console.error('[GET /users] Error:', err);
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 

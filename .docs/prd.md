@@ -20,7 +20,7 @@ GEO Scope is a SaaS platform providing brands with data-driven insights into how
 
 ### 3.2 Brand Analysis Engine (Sampling)
 
-- **Input:** Brand name, industry, and up to 3 competitors.
+- **Input:** Brand name, industry, and up to 10 competitors.
 - **Orchestration:** `apps/api` (Express) to handle long-running LLM calls (~100 prompts) to avoid Vercel Serverless function timeouts.
 - **Providers:** OpenAI, Anthropic, and Google Gemini via Vercel AI SDK.
 
@@ -28,6 +28,7 @@ GEO Scope is a SaaS platform providing brands with data-driven insights into how
 
 - **Charts:** Recharts for "Mention Frequency" and "Sentiment Trends."
 - **UI Components:** Shadcn/ui (Radix + Tailwind) using a responsive dashboard layout.
+- **Competitive Visibility & Share of Voice (SoV):** How often the user brand is mentioned compared to its competitors.
 - **Accuracy Check:** A dedicated section highlighting "Fact vs. Hallucination" detected in LLM responses.
 
 ### 3.4 Report Exports
@@ -57,7 +58,8 @@ The agent must respect the following structure:
 1. User can successfully sign up and complete a Stripe checkout.
 2. User can submit a brand name and trigger a sampling analysis.
 3. The `apps/api` queries at least 2 LLM providers and saves structured results to Supabase.
-4. The Dashboard displays a "Visibility Score" (percentage of mentions) and a "Sentiment Chart."
+4. Accurately detecting brand mention/omission from a generic industry query.
+5. The Dashboard displays a "Visibility Score" (percentage of mentions) and a "Sentiment Chart."
 
 ## 7. Non-Goals
 

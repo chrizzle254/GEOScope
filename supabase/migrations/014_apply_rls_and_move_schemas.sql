@@ -28,9 +28,9 @@ alter table public.reporting_subject enable row level security;
 create policy "Members can view reporting subjects" on public.reporting_subject for select using (organization_id in (select organization_id from public.organization_members where user_id = auth.uid()));
 create policy "Owners/admins can manage reporting subjects" on public.reporting_subject for all using (organization_id in (select organization_id from public.organization_members where user_id = auth.uid() and role in ('owner', 'admin')));
 
-alter table public.reporting_subjectcompetitors enable row level security;
-create policy "Members can view competitors" on public.reporting_subjectcompetitors for select using (reporting_subject_id in (select id from public.reporting_subject where organization_id in (select organization_id from public.organization_members where user_id = auth.uid())));
-create policy "Owners/admins can manage competitors" on public.reporting_subjectcompetitors for all using (reporting_subject_id in (select id from public.reporting_subject where organization_id in (select organization_id from public.organization_members where user_id = auth.uid() and role in ('owner', 'admin'))));
+alter table public.reporting_subject_competitors enable row level security;
+create policy "Members can view competitors" on public.reporting_subject_competitors for select using (reporting_subject_id in (select id from public.reporting_subject where organization_id in (select organization_id from public.organization_members where user_id = auth.uid())));
+create policy "Owners/admins can manage competitors" on public.reporting_subject_competitors for all using (reporting_subject_id in (select id from public.reporting_subject where organization_id in (select organization_id from public.organization_members where user_id = auth.uid() and role in ('owner', 'admin'))));
 
 alter table public.analysis_runs enable row level security;
 create policy "Members can view analysis runs" on public.analysis_runs for select using (reporting_subject_id in (select id from public.reporting_subject where organization_id in (select organization_id from public.organization_members where user_id = auth.uid())));
