@@ -60,11 +60,12 @@ api/
 
 ## 5. Initial Data Schema
 
-- **`profiles`:** Links to `auth.users`. Stores `stripe_customer_id` and subscription status.
-- **`reporting_subject`:** Stores brand names and competitor metadata owned by a `profile_id`.
-- **`analysis_runs`:** Logs an analysis attempt, its status (`pending`, `processing`, `completed`), and timestamps.
-- **`mentions`:** Stores individual data points from each LLM sample. Fields: analysis_run_id, provider_id, sentiment (enum), accurate (boolean), and excerpt (text).
-- **`reporting_subject_metrics`:** Stores the aggregated results for a specific run. Fields: analysis_run_id, visibility_score, accuracy_rate, and sentiment_score.
+- **`users`**: Maps `auth.users` to application metadata and Stripe IDs.
+- **`reporting_subject`**: The target brand/product being tracked.
+- **`reporting_subject_competitors`**: A list of competitors associated with a brand.
+- **`analysis_runs`**: Tracks the execution status (pending, running, completed) of the sampling engine.
+- **`mentions`**: Stores results of individual LLM queries (sentiment, excerpt, and brand presence).
+- **`reporting_subject_metrics`**: High-level aggregated scores (Visibility, Accuracy, Sentiment) derived from an analysis run.
 
 ## 6. Security & Infrastructure
 

@@ -24,11 +24,11 @@
 
 - [x] **Express API: JWT Verification Middleware**
 - [x] **Database Seeding (Development Anchor)**
-  - Manually seed `organizations`, `reporting_subject`, and `reporting_subjectcompetitors`.
+  - Manually seed `organizations`, `reporting_subject`, and `reporting_subject_competitors`.
   - **Session Note:** Added idempotent seed data for `organizations`, `reporting_subject`, and `reporting_subject_competitors` to `supabase/seed.sql` to support brand endpoint development.
 - [ ] **Express API: Brand Endpoints**
   - Create `POST /brands` and `GET /brands` in `apps/api/src/controllers/brandController.ts`.
-  - Map to `public.reporting_subject` and `public.reporting_subjectcompetitors`.
+  - Map to `public.reporting_subject` and `public.reporting_subject_competitors`.
 
 ---
 
