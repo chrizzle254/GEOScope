@@ -13,9 +13,9 @@ const JWKS = createRemoteJWKSet(new URL(`${SUPABASE_AUTH_URL}/.well-known/jwks.j
 declare module 'express-serve-static-core' {
   interface Request {
     user?: {
-      id: string;           // internal public.users.id (UUID)
-      auth_id: string;      // Supabase auth.users.id (sub claim)
-      role: string;         // Role from organization_members
+      id: string; // internal public.users.id (UUID)
+      auth_id: string; // Supabase auth.users.id (sub claim)
+      role: string; // Role from organization_members
       organization_id: string;
     };
   }
@@ -64,13 +64,15 @@ export async function authenticateUser(req: Request, res: Response, next: NextFu
     // 2. Resolve internal Profile and Organization context in one round-trip
     const { data, error: contextError } = await supabase
       .from('users')
-      .select(`
+      .select(
+        `
         id,
         organization_members!inner (
           organization_id,
           role
         )
-      `)
+      `,
+      )
       .eq('auth_id', decoded.sub)
       .single();
 
@@ -95,8 +97,8 @@ export async function authenticateUser(req: Request, res: Response, next: NextFu
     next();
   } catch (error) {
     console.error('JWT_VERIFICATION_ERROR:', error);
-    return res.status(401).json({ 
-      error: 'Authentication failed: Invalid or expired token.' 
+    return res.status(401).json({
+      error: 'Authentication failed: Invalid or expired token.',
     });
   }
 }

@@ -33,6 +33,7 @@ app.get('/users/me', authenticateUser, async (req, res) => {
     }
     res.json({ data });
   } catch (err) {
+    console.error('[GET /users] Error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -57,6 +58,7 @@ app.get('/users', authenticateUser, async (req, res) => {
     if (error) throw error;
     res.json({ data });
   } catch (err) {
+    console.error('[GET /users] Error:', err);
     res.status(500).json({ error: 'Failed to fetch users' });
   }
 });
@@ -86,6 +88,7 @@ app.post('/organizations', authenticateUser, async (req, res) => {
 
     res.status(201).json({ data });
   } catch (err) {
+    console.error('[GET /users] Error:', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

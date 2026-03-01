@@ -12,7 +12,7 @@ export async function getBrands(req: Request, res: Response) {
       name,
       industry,
       reporting_subject_competitors (id, name)
-    `
+    `,
     )
     .eq('organization_id', organization_id);
 
@@ -36,7 +36,9 @@ export async function createBrand(req: Request, res: Response) {
   const { name, industry, competitors } = req.body;
 
   if (!name || !industry || !Array.isArray(competitors)) {
-    return res.status(400).json({ error: 'Missing required fields: name, industry, competitors (must be an array)' });
+    return res
+      .status(400)
+      .json({ error: 'Missing required fields: name, industry, competitors (must be an array)' });
   }
 
   const { data: subject, error: subjectError } = await supabase
