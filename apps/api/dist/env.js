@@ -14,4 +14,5 @@ export const env = cleanEnv(process.env, {
     SUPABASE_URL: str(),
     NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY: str(),
     SUPABASE_SERVICE_ROLE_KEY: str(),
+    SUPABASE_JWT_SECRET: str(),
 });
