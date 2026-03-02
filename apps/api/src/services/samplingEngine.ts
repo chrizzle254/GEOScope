@@ -23,11 +23,11 @@ export interface AnalysisOptions {
  * @param options - The analysis configuration containing brand info.
  */
 export async function runAnalysis(analysisId: string, options: AnalysisOptions) {
-  // 1. Set Status to 'processing'
+  // Set Status to 'processing'
   await supabaseAdmin.from('analysis_runs').update({ status: 'processing' }).eq('id', analysisId);
 
   try {
-    // 2. Load System Prompts from the database
+    // Load System Prompts from the database
     const { data: prompts, error: promptsError } = await supabaseAdmin.from('prompts').select('*');
     if (promptsError) throw promptsError;
     if (!prompts || prompts.length === 0) {
@@ -48,10 +48,10 @@ export async function runAnalysis(analysisId: string, options: AnalysisOptions) 
           // Use generateText for full backend responses
           const { text } = await generateText({
             model: model.instance,
-            prompt: promptDoc.content, // Prompts are "blind" and don't mention the brand
+            prompt: promptDoc.content, 
           });
 
-          // 3. Atomic Write to the persistence layer
+          // Atomic Write to the persistence layer
           await supabaseAdmin.from('llm_responses').insert({
             analysis_run_id: analysisId,
             provider: model.id,
@@ -72,7 +72,7 @@ export async function runAnalysis(analysisId: string, options: AnalysisOptions) 
     // Wait for all throttled promises to resolve
     await Promise.all(tasks);
 
-    // 4. Set Status to 'completed'
+    // Set Status to 'completed'
     await supabaseAdmin.from('analysis_runs').update({ status: 'completed' }).eq('id', analysisId);
 
   } catch (error) {
