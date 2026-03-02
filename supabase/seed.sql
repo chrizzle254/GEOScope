@@ -49,3 +49,46 @@ SELECT id, 'Framer' FROM subject
 UNION ALL
 SELECT id, 'Squarespace' FROM subject
 ON CONFLICT (reporting_subject_id, name) DO NOTHING;
+
+--
+-- Seed data for Blind Prompt Library (Phase 2)
+--
+
+-- These prompts are "blind" and should not mention the user's brand.
+-- The `id` is a UUID to ensure stable identifiers across environments.
+INSERT INTO internal.prompts (id, text) VALUES
+-- Tech & SaaS
+('a1b2c3d4-0001-4001-8001-1234567890ab', 'What are the most innovative CRM platforms for small businesses right now?'),
+('a1b2c3d4-0002-4002-8002-1234567890ab', 'Compare the top 3 project management tools for remote software teams.'),
+('a1b2c3d4-0003-4003-8003-1234567890ab', 'Describe the current landscape of cloud storage providers for enterprise.'),
+('a1b2c3d4-0011-4011-8011-1234567890ab', 'What are the leading platforms for building and deploying serverless applications?'),
+
+-- E-commerce & Retail
+('a1b2c3d4-0004-4004-8004-1234567890ab', 'Which direct-to-consumer mattress brands offer the best value for money?'),
+('a1b2c3d4-0005-4005-8005-1234567890ab', 'What are the key features to look for in a modern e-commerce platform for a growing business?'),
+
+-- Finance & Fintech
+('a1b2c3d4-0006-4006-8006-1234567890ab', 'List the most popular mobile apps for stock trading and their primary benefits for beginners.'),
+('a1b2c3d4-0007-4007-8007-1234567890ab', 'What are the main differences between robo-advisors like Wealthfront and Betterment?'),
+
+-- Travel & Hospitality
+('a1b2c3d4-0008-4008-8008-1234567890ab', 'What are the best booking websites for finding budget-friendly international flights and hotels?'),
+
+-- Automotive
+('a1b2c3d4-0009-4009-8009-1234567890ab', 'Compare the latest electric vehicle models from major manufacturers in terms of range, charging speed, and features.'),
+
+-- Health & Wellness
+('a1b2c3d4-0010-4010-8010-1234567890ab', 'What are the top-rated meditation and mindfulness apps available today for reducing stress?'),
+
+-- Marketing & Advertising
+('a1b2c3d4-0012-4012-8012-1234567890ab', 'Which email marketing platforms are best suited for content creators and newsletters?'),
+
+-- Real Estate
+('a1b2c3d4-0013-4013-8013-1234567890ab', 'What are the most effective online platforms for finding residential properties for rent?'),
+
+-- Food & Beverage
+('a1b2c3d4-0014-4014-8014-1234567890ab', 'Which meal kit delivery services offer the best options for vegetarian and vegan diets?'),
+
+-- Entertainment
+('a1b2c3d4-0015-4015-8015-1234567890ab', 'Compare the libraries and original content of major video streaming services.')
+ON CONFLICT (id) DO NOTHING;
