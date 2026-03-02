@@ -4,6 +4,7 @@ import { env } from './env';
 import { authenticateUser } from './middleware/auth';
 import { getBrands, createBrand } from './controllers/brandController';
 import { supabase } from './lib/supabase';
+import analysisRoutes from './routes/analysisRoutes';
 
 const app = express();
 app.use(cors());
@@ -12,6 +13,10 @@ app.use(express.json());
 app.get('/health', (_req: Request, res: Response) => {
   res.json({ status: 'ok' });
 });
+
+// --- Analysis Routes ---
+app.use('/api/v1/analyses', analysisRoutes);
+// --- End Analysis Routes ---
 
 // --- Brand Routes ---
 app.get('/brands', authenticateUser, getBrands);
