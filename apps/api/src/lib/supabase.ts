@@ -8,7 +8,6 @@ export const supabaseAdmin = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE
     persistSession: false,
   },
   db: {
-    // Add internal to the search path to access tables like `prompts`
-    schema: 'public, internal',
+    schema: 'public',
   },
 });

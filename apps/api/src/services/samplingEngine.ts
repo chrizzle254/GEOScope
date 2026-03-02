@@ -27,8 +27,11 @@ export async function runAnalysis(analysisId: string, options: AnalysisOptions) 
   await supabaseAdmin.from('analysis_runs').update({ status: 'processing' }).eq('id', analysisId);
 
   try {
-    // Load System Prompts from the database
-    const { data: prompts, error: promptsError } = await supabaseAdmin.from('prompts').select('*');
+    // 2. Load System Prompts from the database (internal schema)
+    const { data: prompts, error: promptsError } = await supabaseAdmin
+      .schema('internal')
+      .from('prompts')
+      .select('*');
     if (promptsError) throw promptsError;
     if (!prompts || prompts.length === 0) {
       throw new Error('No system prompts found in the database.');
