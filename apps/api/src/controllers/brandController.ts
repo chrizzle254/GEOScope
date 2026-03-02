@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
-import { supabase } from '../lib/supabase';
+import { supabaseAdmin } from '../lib/supabase';
 
 export async function getBrands(req: Request, res: Response) {
   const organization_id = req.user!.organization_id;
 
-  const { data: subjects, error } = await supabase
+  const { data: subjects, error } = await supabaseAdmin
     .from('reporting_subject')
     .select(
       `
@@ -41,7 +41,7 @@ export async function createBrand(req: Request, res: Response) {
       .json({ error: 'Missing required fields: name, industry, competitors (must be an array)' });
   }
 
-  const { data: subject, error: subjectError } = await supabase
+  const { data: subject, error: subjectError } = await supabaseAdmin
     .from('reporting_subject')
     .insert({ name, industry, organization_id })
     .select()
@@ -59,7 +59,7 @@ export async function createBrand(req: Request, res: Response) {
       reporting_subject_id: subject.id,
     }));
 
-    const { data, error: competitorError } = await supabase
+    const { data, error: competitorError } = await supabaseAdmin
       .from('reporting_subject_competitors')
       .insert(competitorRecords)
       .select();
