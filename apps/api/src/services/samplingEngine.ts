@@ -27,11 +27,8 @@ export async function runAnalysis(analysisId: string, options: AnalysisOptions) 
   await supabaseAdmin.from('analysis_runs').update({ status: 'processing' }).eq('id', analysisId);
 
   try {
-    // 2. Load System Prompts from the database (internal schema)
-    const { data: prompts, error: promptsError } = await supabaseAdmin
-      .schema('internal')
-      .from('prompts')
-      .select('*');
+    // 2. Load System Prompts from the database via RPC (internal schema)
+    const { data: prompts, error: promptsError } = await supabaseAdmin.rpc('get_internal_prompts');
     if (promptsError) throw promptsError;
     if (!prompts || prompts.length === 0) {
       throw new Error('No system prompts found in the database.');
@@ -51,7 +48,7 @@ export async function runAnalysis(analysisId: string, options: AnalysisOptions) 
           // Use generateText for full backend responses
           const { text } = await generateText({
             model: model.instance,
-            prompt: promptDoc.content, 
+            prompt: promptDoc.text, 
           });
 
           // Atomic Write to the persistence layer
