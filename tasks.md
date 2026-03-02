@@ -26,7 +26,7 @@
 - [x] **Database Seeding (Development Anchor)**
   - Manually seed `organizations`, `reporting_subject`, and `reporting_subject_competitors`.
   - **Session Note:** Added idempotent seed data for `organizations`, `reporting_subject`, and `reporting_subject_competitors` to `supabase/seed.sql` to support brand endpoint development.
-- [ ] **Express API: Brand Endpoints**
+- [x] **Express API: Brand Endpoints**
   - Create `POST /brands` and `GET /brands` in `apps/api/src/controllers/brandController.ts`.
   - Map to `public.reporting_subject` and `public.reporting_subject_competitors`.
 
@@ -68,6 +68,10 @@
   - Set up Stripe Webhooks in `apps/api/src/controllers/billingController.ts`.
 - [ ] **Access Control Middleware**
   - Backend middleware to block analysis if a valid subscription is missing.
+- [ ] **Secure LLM API Key Management**
+  - Create `organization_llm_keys` table to store encrypted API keys.
+  - Build API endpoints for CRUD operations on keys.
+  - Tie key usage to organization membership.
 
 ---
 
