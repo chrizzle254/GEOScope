@@ -1,16 +1,30 @@
--- seed auth user first
-insert into auth.users (id, email, encrypted_password, role, created_at)
-values (
-  '00000000-0000-0000-0000-000000000001',
-  'jeffrey@example.com',
-  '$2a$10$g8aFln7j0IALzUGWzulKzut1UEOeUFmxl/C3fUEbDmfbD8o.RSa3O',  -- pw to enter: 123456 
-  'authenticated',
-  now()
-);
+-- seed auth users
+insert into auth.users (id, email, encrypted_password, role, created_at, email_confirmed_at,aud)
+values 
+  (
+    '00000000-0000-0000-0000-000000000001',
+    'jeffrey@expl.com',
+    '$2a$10$vfMSc1Y9gmzhL1L2h4RFb.J93vVdVSb0dF/WlDAsPOX.D8h16BVGy',  -- pw to enter: 123456 
+    'authenticated',
+    now(),
+    now(),
+    'authenticated'
+  ),
+  (
+    '00000000-0000-0000-0000-000000000002',
+    'test@expl.com',
+    '$2a$10$vfMSc1Y9gmzhL1L2h4RFb.J93vVdVSb0dF/WlDAsPOX.D8h16BVGy',  -- pw to enter: 123456 
+    'authenticated',
+    now(),
+    now(),
+    'authenticated'
+  );
 
 -- then insert into public.users
 insert into users (auth_id, full_name)
-values ('00000000-0000-0000-0000-000000000001', 'Jeffrey');
+values 
+  ('00000000-0000-0000-0000-000000000001', 'Jeffrey'),
+  ('00000000-0000-0000-0000-000000000002', 'Test User');
 
 --
 -- Seed data for Brand Management (Phase 1)
@@ -19,13 +33,18 @@ values ('00000000-0000-0000-0000-000000000001', 'Jeffrey');
 -- Upsert 'Acme Inc.' organization
 INSERT INTO public.organizations (name) VALUES ('Acme Inc.') ON CONFLICT (name) DO NOTHING;
 
--- Grant ownership of 'Acme Inc.' to the test user
+-- Grant ownership of 'Acme Inc.' to the test users
 -- This query finds the organization's ID and the user's ID from public.users
 -- and uses them to create the membership link.
 INSERT INTO public.organization_members (organization_id, user_id, role)
 SELECT 
     (SELECT id FROM public.organizations WHERE name = 'Acme Inc.'),
     (SELECT id FROM public.users WHERE auth_id = '00000000-0000-0000-0000-000000000001'),
+    'owner'
+UNION ALL
+SELECT 
+    (SELECT id FROM public.organizations WHERE name = 'Acme Inc.'),
+    (SELECT id FROM public.users WHERE auth_id = '00000000-0000-0000-0000-000000000002'),
     'owner'
 ON CONFLICT (organization_id, user_id) DO NOTHING;
 
@@ -55,12 +74,12 @@ ON CONFLICT (reporting_subject_id, name) DO NOTHING;
 --
 
 -- These are the supported LLM providers and their model identifiers
--- The `provider_id` maps to the SupportedModel type in packages/shared/types
-INSERT INTO internal.llm_providers (provider_id, provider_name, model_name, is_active) VALUES
-('openai', 'OpenAI', 'gpt-5.2', true),
-('anthropic', 'Anthropic', 'claude-4.6', true),
-('google', 'Google', 'gemini-3.1-pro', true)
-ON CONFLICT (provider_id) DO NOTHING;
+-- The `id` maps to the SupportedModel type in packages/shared/types
+INSERT INTO internal.llm_providers (id, provider_name, model_version, is_active) VALUES
+('openai', 'OpenAI', 'gpt-5-nano', true),
+('anthropic', 'Anthropic', 'claude-4-haku', true),
+('google', 'Google', 'gemini-2.5-flash', true)
+ON CONFLICT (id) DO NOTHING;
 
 --
 -- Seed data for Blind Prompt Library (Phase 2)

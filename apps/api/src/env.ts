@@ -18,4 +18,8 @@ export const env = cleanEnv(process.env, {
   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY: str(),
   SUPABASE_SERVICE_ROLE_KEY: str(),
   SUPABASE_JWT_SECRET: str(),
+  // LLM Provider API Keys (optional - only required if using the respective model)
+  OPENAI_API_KEY: str({ default: '' }),
+  ANTHROPIC_API_KEY: str({ default: '' }),
+  GOOGLE_API_KEY: str({ default: '' }),
 });

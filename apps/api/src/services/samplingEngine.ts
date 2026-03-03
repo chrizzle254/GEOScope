@@ -26,6 +26,8 @@ export interface AnalysisOptions {
  * @param options - The analysis configuration containing brand, competitors, and selected models.
  */
 export async function runAnalysis(analysisId: string, options: AnalysisOptions) {
+  console.log(`[runAnalysis] Starting analysis ${analysisId} with options:`, options);
+  
   // Set Status to 'processing'
   await supabaseAdmin.from('analysis_runs').update({ status: 'processing' }).eq('id', analysisId);
 
@@ -36,6 +38,7 @@ export async function runAnalysis(analysisId: string, options: AnalysisOptions) 
     if (!prompts || prompts.length === 0) {
       throw new Error('No system prompts found in the database.');
     }
+    console.log(`[runAnalysis] Loaded ${prompts.length} prompts`);
 
     // 3. Fetch provider details from database
     const { data: providers, error: providersError } = await supabaseAdmin.rpc('get_llm_providers');
@@ -43,11 +46,13 @@ export async function runAnalysis(analysisId: string, options: AnalysisOptions) 
     if (!providers || providers.length === 0) {
       throw new Error('No active LLM providers found in the database.');
     }
+    console.log(`[runAnalysis] Loaded ${providers.length} providers`);
 
     // 4. Filter to only requested models and build instances dynamically
     const requestedProviders = providers.filter((p: any) => 
-      options.models.includes(p.provider_id as SupportedModel)
+      options.models.includes(p.id as SupportedModel)
     );
+    console.log(`[runAnalysis] Filtered to ${requestedProviders.length} requested providers:`, requestedProviders.map((p: any) => p.id));
 
     if (requestedProviders.length === 0) {
       throw new Error('No valid providers found for the requested models.');
@@ -56,26 +61,31 @@ export async function runAnalysis(analysisId: string, options: AnalysisOptions) 
     // 5. Build model instances dynamically based on provider configuration
     const models = requestedProviders.map((provider: any) => {
       let instance;
-      switch (provider.provider_id) {
+      switch (provider.id) {
         case 'openai':
-          instance = openai(provider.model_name); // e.g., 'gpt-5.2'
+          instance = openai(provider.model_version); // e.g., 'gpt-5.2'
           break;
         case 'anthropic':
-          instance = anthropic(provider.model_name); // e.g., 'claude-4.6'
+          instance = anthropic(provider.model_version); // e.g., 'claude-4.6'
           break;
         case 'google':
-          instance = google(provider.model_name); // e.g., 'gemini-3.1-pro'
+          instance = google(provider.model_version); // e.g., 'gemini-3.1-pro'
           break;
         default:
-          throw new Error(`Unsupported provider: ${provider.provider_id}`);
+          throw new Error(`Unsupported provider: ${provider.id}`);
       }
-      return { id: provider.provider_id, instance };
+      return { id: provider.id, instance };
     });
+    console.log(`[runAnalysis] Built ${models.length} model instances`);
 
     // 6. Create a queue of tasks using p-limit
+    console.log(`[runAnalysis] Creating task queue: ${prompts.length} prompts × ${models.length} models = ${prompts.length * models.length} total tasks`);
+    
     const tasks = prompts.flatMap((promptDoc: any) =>
       models.map(model => limit(async () => {
         try {
+          console.log(`[runAnalysis] Calling ${model.id} for prompt ${promptDoc.id}`);
+          
           // Use generateText for full backend responses
           const { text } = await generateText({
             model: model.instance,
@@ -87,13 +97,22 @@ export async function runAnalysis(analysisId: string, options: AnalysisOptions) 
             ],
           });
 
-          // Atomic Write to the persistence layer
-          await supabaseAdmin.from('llm_responses').insert({
-            analysis_run_id: analysisId,
-            provider: model.id,
-            raw_content: text,
-            prompt_id: promptDoc.id
+          console.log(`[runAnalysis] ${model.id} responded for prompt ${promptDoc.id}, length: ${text.length}`);
+
+          // Atomic Write to the persistence layer via RPC (internal schema)
+          const { data: responseId, error: insertError } = await supabaseAdmin.rpc('insert_llm_response', {
+            p_analysis_run_id: analysisId,
+            p_provider: model.id,
+            p_raw_content: text,
+            p_prompt_id: promptDoc.id
           });
+
+          if (insertError) {
+            console.error(`[runAnalysis] Failed to save response from ${model.id} for prompt ${promptDoc.id}:`, insertError);
+            throw insertError;
+          }
+
+          console.log(`[runAnalysis] Saved response from ${model.id} for prompt ${promptDoc.id}, response ID: ${responseId}`);
 
           // TODO: Trigger extraction logic here (Task: "Mention Extraction Parser")
 
@@ -105,8 +124,12 @@ export async function runAnalysis(analysisId: string, options: AnalysisOptions) 
       }))
     );
 
+    console.log(`[runAnalysis] Starting execution of ${tasks.length} tasks with concurrency limit of 10`);
+    
     // Wait for all throttled promises to resolve
     await Promise.all(tasks);
+
+    console.log(`[runAnalysis] All tasks completed for analysis ${analysisId}`);
 
     // Set Status to 'completed'
     await supabaseAdmin.from('analysis_runs').update({ status: 'completed' }).eq('id', analysisId);

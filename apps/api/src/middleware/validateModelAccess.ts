@@ -44,6 +44,9 @@ export async function validateModelAccess(req: Request, res: Response, next: Nex
     // 3. Check if models exist in internal.llm_providers
     const { data: providers, error: providersError } = await supabaseAdmin.rpc('get_llm_providers');
 
+    console.log('[validateModelAccess] Providers from DB:', providers);
+    console.log('[validateModelAccess] Requested models:', models);
+
     if (providersError) {
       console.error('Failed to fetch LLM providers:', providersError);
       return res.status(500).json({ error: 'Configuration error' });
@@ -54,8 +57,11 @@ export async function validateModelAccess(req: Request, res: Response, next: Nex
       return res.status(500).json({ error: 'Configuration error' });
     }
 
-    const availableProviderIds = providers.map((p: any) => p.provider_id);
+    const availableProviderIds = providers.map((p: any) => p.id);
+    console.log('[validateModelAccess] Available provider IDs:', availableProviderIds);
+    
     const unavailableModels = models.filter((m: string) => !availableProviderIds.includes(m));
+    console.log('[validateModelAccess] Unavailable models:', unavailableModels);
 
     if (unavailableModels.length > 0) {
       return res.status(403).json({
