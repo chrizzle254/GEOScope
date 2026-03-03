@@ -1,6 +1,9 @@
 {
   "name": "@geoscope/shared",
   "version": "0.0.1",
-  "main": "index.ts",
-  "types": "index.ts"
+  "type": "module",
+  "exports": {
+    "./types": "./types/index.ts"
+  },
+  "types": "./types/index.ts"
 }

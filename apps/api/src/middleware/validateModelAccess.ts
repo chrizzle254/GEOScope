@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { supabaseAdmin } from '../lib/supabase';
 import { env } from '../env';
-import { SupportedModel, SUPPORTED_MODELS } from '@repo/shared/types';
+import { SupportedModel, SUPPORTED_MODELS } from '@geoscope/shared/types';
 
 /**
  * Extend Express Request to include validated models

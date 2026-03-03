@@ -4,7 +4,7 @@ import { anthropic } from '@ai-sdk/anthropic';
 import { google } from '@ai-sdk/google';
 import pLimit from 'p-limit';
 import { supabaseAdmin } from '../lib/supabase';
-import { SupportedModel } from '@repo/shared/types';
+import { SupportedModel } from '@geoscope/shared/types';
 
 // Restrict concurrency to 10 simultaneous LLM calls
 const limit = pLimit(10);

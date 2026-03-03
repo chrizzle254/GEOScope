@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { supabaseAdmin } from '../lib/supabase';
 import { runAnalysis } from '../services/samplingEngine';
-import { SupportedModel } from '@repo/shared/types';
+import { SupportedModel } from '@geoscope/shared/types';
 
 interface TriggerAnalysisBody {
   brand: string;
