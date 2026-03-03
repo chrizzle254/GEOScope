@@ -1,11 +1,13 @@
 import { Request, Response } from 'express';
 import { supabaseAdmin } from '../lib/supabase';
 import { runAnalysis } from '../services/samplingEngine';
+import { SupportedModel } from '@repo/shared/types';
 
 interface TriggerAnalysisBody {
   brand: string;
   industry: string;
   competitors: string[];
+  models?: SupportedModel[]; // Optional, defaults to all in middleware
 }
 
 /**
@@ -35,12 +37,13 @@ export async function triggerAnalysis(req: Request, res: Response) {
       return res.status(400).json({ error: 'Competitors array must contain between 1 and 10 items.' });
     }
 
-    // 2. Extract authenticated user context
+    // 2. Extract authenticated user context and validated models
     if (!req.user) {
       return res.status(401).json({ error: 'User context not found. Authentication required.' });
     }
 
     const { id: userId, organization_id: organizationId } = req.user;
+    const models = req.validatedModels!; // Already validated by middleware
 
     // 3. Resolve or create the reporting_subject for this brand
     // First, check if the brand already exists for this organization
@@ -80,13 +83,14 @@ export async function triggerAnalysis(req: Request, res: Response) {
       reportingSubjectId = newSubject.id;
     }
 
-    // 4. Initial Persistence: Create analysis_run with status 'pending'
+    // 4. Initial Persistence: Create analysis_run with status 'pending' and selected models
     const { data: analysisRun, error: analysisInsertError } = await supabaseAdmin
       .from('analysis_runs')
       .insert({
         reporting_subject_id: reportingSubjectId,
         status: 'pending',
         created_by: userId,
+        selected_models: models, // Store the validated models
       })
       .select('id')
       .single();
@@ -99,7 +103,7 @@ export async function triggerAnalysis(req: Request, res: Response) {
     const analysisId = analysisRun.id;
 
     // 5. Fire-and-Forget: Trigger the sampling engine WITHOUT await
-    runAnalysis(analysisId, { brand, competitors }).catch((error) => {
+    runAnalysis(analysisId, { brand, competitors, models }).catch((error) => {
       console.error(`Background analysis ${analysisId} failed:`, error);
       // The runAnalysis service already handles its own error persistence
     });
