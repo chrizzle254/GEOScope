@@ -51,6 +51,18 @@ SELECT id, 'Squarespace' FROM subject
 ON CONFLICT (reporting_subject_id, name) DO NOTHING;
 
 --
+-- Seed data for LLM Providers (Phase 2)
+--
+
+-- These are the supported LLM providers and their model identifiers
+-- The `provider_id` maps to the SupportedModel type in packages/shared/types
+INSERT INTO internal.llm_providers (provider_id, provider_name, model_name, is_active) VALUES
+('openai', 'OpenAI', 'gpt-5.2', true),
+('anthropic', 'Anthropic', 'claude-4.6', true),
+('google', 'Google', 'gemini-3.1-pro', true)
+ON CONFLICT (provider_id) DO NOTHING;
+
+--
 -- Seed data for Blind Prompt Library (Phase 2)
 --
 
