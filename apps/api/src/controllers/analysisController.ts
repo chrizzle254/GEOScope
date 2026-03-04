@@ -34,7 +34,9 @@ export async function triggerAnalysis(req: Request, res: Response) {
     }
 
     if (competitors.length === 0 || competitors.length > 10) {
-      return res.status(400).json({ error: 'Competitors array must contain between 1 and 10 items.' });
+      return res
+        .status(400)
+        .json({ error: 'Competitors array must contain between 1 and 10 items.' });
     }
 
     // 2. Extract authenticated user context and validated models

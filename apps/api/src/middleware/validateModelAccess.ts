@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { supabaseAdmin } from '../lib/supabase';
 import { env } from '../env';
-import { SupportedModel, SUPPORTED_MODELS } from '@geoscope/shared/types';
+import { SupportedModel, SUPPORTED_MODELS, LLMProvider } from '@geoscope/shared/types';
 
 /**
  * Extend Express Request to include validated models
@@ -14,13 +14,13 @@ declare module 'express-serve-static-core' {
 
 /**
  * Middleware to validate model selection and API key availability.
- * 
+ *
  * Validates:
  * 1. Models array is valid (defaults to all if not provided)
  * 2. Requested models are supported
  * 3. Models exist in internal.llm_providers
  * 4. Required API keys are configured
- * 
+ *
  * Attaches validated models to req.validatedModels
  */
 export async function validateModelAccess(req: Request, res: Response, next: NextFunction) {
@@ -33,7 +33,9 @@ export async function validateModelAccess(req: Request, res: Response, next: Nex
     }
 
     // 2. Validate that all requested models are supported
-    const invalidModels = models.filter((m: string) => !SUPPORTED_MODELS.includes(m as SupportedModel));
+    const invalidModels = models.filter(
+      (m: string) => !SUPPORTED_MODELS.includes(m as SupportedModel),
+    );
     if (invalidModels.length > 0) {
       return res.status(400).json({
         error: 'Invalid model selection',
@@ -57,9 +59,9 @@ export async function validateModelAccess(req: Request, res: Response, next: Nex
       return res.status(500).json({ error: 'Configuration error' });
     }
 
-    const availableProviderIds = providers.map((p: any) => p.id);
+    const availableProviderIds = providers.map((p: LLMProvider) => p.id);
     console.log('[validateModelAccess] Available provider IDs:', availableProviderIds);
-    
+
     const unavailableModels = models.filter((m: string) => !availableProviderIds.includes(m));
     console.log('[validateModelAccess] Unavailable models:', unavailableModels);
 

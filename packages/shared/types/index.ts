@@ -17,3 +17,21 @@ export const SUPPORTED_MODELS: readonly SupportedModel[] = [
   'anthropic',
   'google',
 ] as const;
+
+/**
+ * LLM Provider from internal.llm_providers table
+ */
+export interface LLMProvider {
+  id: SupportedModel;
+  provider_name: string;
+  model_version: string;
+  is_active: boolean;
+}
+
+/**
+ * Prompt from internal.prompts table
+ */
+export interface Prompt {
+  id: string;
+  text: string;
+}
