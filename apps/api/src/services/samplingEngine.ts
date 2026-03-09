@@ -149,7 +149,7 @@ export async function runAnalysis(analysisId: string, options: AnalysisOptions) 
         limit(async () => {
           try {
             const filledPrompt = fillTemplate(promptDoc.template_text, templateData);
-            
+
             console.log(`[runAnalysis] Calling ${model.id} for prompt ${promptDoc.id}`);
             console.log(`[runAnalysis] Filled prompt: "${filledPrompt.substring(0, 100)}..."`);
 
