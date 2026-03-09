@@ -3,7 +3,8 @@ import cors from 'cors';
 import { env } from './env';
 import { authenticateUser } from './middleware/auth';
 import { getBrands, createBrand } from './controllers/brandController';
-import { supabase } from './lib/supabase';
+import { supabaseAdmin } from './lib/supabase';
+import analysisRoutes from './routes/analysisRoutes';
 
 const app = express();
 app.use(cors());
@@ -13,6 +14,10 @@ app.get('/health', (_req: Request, res: Response) => {
   res.json({ status: 'ok' });
 });
 
+// --- Analysis Routes ---
+app.use('/api/v1/analyses', analysisRoutes);
+// --- End Analysis Routes ---
+
 // --- Brand Routes ---
 app.get('/brands', authenticateUser, getBrands);
 app.post('/brands', authenticateUser, createBrand);
@@ -21,7 +26,7 @@ app.post('/brands', authenticateUser, createBrand);
 // Protected: Get current user profile
 app.get('/users/me', authenticateUser, async (req, res) => {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseAdmin
       .from('users')
       .select('*')
       .eq('auth_id', req.user!.auth_id) // Correctly use auth_id
@@ -42,7 +47,7 @@ app.get('/users/me', authenticateUser, async (req, res) => {
 app.get('/users', authenticateUser, async (req, res) => {
   try {
     // 1. Check if the requester is actually an admin in your 'users' table
-    const { data: adminUser } = await supabase
+    const { data: adminUser } = await supabaseAdmin
       .from('users')
       .select('role')
       .eq('auth_id', req.user!.id)
@@ -53,7 +58,7 @@ app.get('/users', authenticateUser, async (req, res) => {
     }
 
     // 2. Use admin client to fetch all (bypassing RLS)
-    const { data, error } = await supabase.from('users').select('*');
+    const { data, error } = await supabaseAdmin.from('users').select('*');
 
     if (error) throw error;
     res.json({ data });
@@ -70,7 +75,7 @@ app.post('/organizations', authenticateUser, async (req, res) => {
 
   try {
     // Get the internal UUID for the user from our public.users table
-    const { data: userData } = await supabase
+    const { data: userData } = await supabaseAdmin
       .from('users')
       .select('id')
       .eq('auth_id', req.user!.id)
@@ -79,7 +84,7 @@ app.post('/organizations', authenticateUser, async (req, res) => {
     if (!userData) return res.status(404).json({ error: 'User record missing' });
 
     // This RPC creates the org and sets the creator as owner in organization_members
-    const { data, error } = await supabase.rpc('create_organization_with_owner', {
+    const { data, error } = await supabaseAdmin.rpc('create_organization_with_owner', {
       org_name: name,
       user_id: userData.id,
     });

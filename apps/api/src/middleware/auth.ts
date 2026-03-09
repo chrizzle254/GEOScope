@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { jwtVerify, createRemoteJWKSet, JWTPayload } from 'jose';
 import { env } from '../env';
-import { supabase } from '../lib/supabase';
+import { supabaseAdmin } from '../lib/supabase';
 
 // Normalize URL to prevent double-slashes and set up JWKS
 const SUPABASE_AUTH_URL = `${env.SUPABASE_URL.replace(/\/$/, '')}/auth/v1`;
@@ -62,7 +62,7 @@ export async function authenticateUser(req: Request, res: Response, next: NextFu
     if (!decoded.sub) throw new Error('Missing sub claim');
 
     // 2. Resolve internal Profile and Organization context in one round-trip
-    const { data, error: contextError } = await supabase
+    const { data, error: contextError } = await supabaseAdmin
       .from('users')
       .select(
         `
