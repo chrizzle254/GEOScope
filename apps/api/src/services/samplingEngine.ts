@@ -4,16 +4,45 @@ import { anthropic } from '@ai-sdk/anthropic';
 import { google } from '@ai-sdk/google';
 import pLimit from 'p-limit';
 import { supabaseAdmin } from '../lib/supabase';
-import { SupportedModel, LLMProvider, Prompt } from '@geoscope/shared/types';
+import { SupportedModel, LLMProvider, Prompt, TemplateData } from '@geoscope/shared/types';
 import type { LanguageModel } from 'ai';
 
 // Restrict concurrency to 10 simultaneous LLM calls
 const limit = pLimit(10);
 
 export interface AnalysisOptions {
-  brand: string;
-  competitors: string[];
+  reportingSubjectId: string;
+  organizationId: string;
   models: SupportedModel[];
+}
+
+/**
+ * Fill template placeholders with actual brand data
+ */
+function fillTemplate(template: string, data: TemplateData): string {
+  if (!template || template.trim() === '') {
+    throw new Error('Template text is empty or undefined');
+  }
+
+  let filled = template;
+
+  Object.entries(data).forEach(([key, value]) => {
+    if (value) {
+      const placeholder = new RegExp(`{{${key}}}`, 'g');
+      filled = filled.replace(placeholder, value);
+    }
+  });
+
+  // Remove any unfilled placeholders
+  filled = filled.replace(/{{[^}]+}}/g, '').trim();
+
+  // Ensure we still have content after processing
+  if (!filled || filled === '') {
+    console.warn(`Template resulted in empty string. Original: "${template}"`);
+    return template; // Return original if processing resulted in empty string
+  }
+
+  return filled;
 }
 
 /**
@@ -33,6 +62,29 @@ export async function runAnalysis(analysisId: string, options: AnalysisOptions) 
   await supabaseAdmin.from('analysis_runs').update({ status: 'processing' }).eq('id', analysisId);
 
   try {
+    // 1. Fetch brand metadata and competitors
+    const { data: brand, error: brandError } = await supabaseAdmin
+      .from('reporting_subject')
+      .select('*, reporting_subject_competitors(*)')
+      .eq('id', options.reportingSubjectId)
+      .single();
+
+    if (brandError || !brand) {
+      throw new Error(`Brand not found: ${brandError?.message}`);
+    }
+
+    // Prepare template data
+    const templateData: TemplateData = {
+      brand_name: brand.name,
+      industry: brand.industry || 'general',
+      target_audience: brand.target_audience || 'consumers',
+      competitor_1: brand.reporting_subject_competitors[0]?.name,
+      competitor_2: brand.reporting_subject_competitors[1]?.name,
+      competitor_3: brand.reporting_subject_competitors[2]?.name,
+    };
+
+    console.log(`[runAnalysis] Prepared template data:`, templateData);
+
     // 2. Load System Prompts from the database via RPC (internal schema)
     const { data: prompts, error: promptsError } = await supabaseAdmin.rpc('get_internal_prompts');
     if (promptsError) throw promptsError;
@@ -96,7 +148,10 @@ export async function runAnalysis(analysisId: string, options: AnalysisOptions) 
       models.map((model: ModelInstance) =>
         limit(async () => {
           try {
+            const filledPrompt = fillTemplate(promptDoc.template_text, templateData);
+
             console.log(`[runAnalysis] Calling ${model.id} for prompt ${promptDoc.id}`);
+            console.log(`[runAnalysis] Filled prompt: "${filledPrompt.substring(0, 100)}..."`);
 
             // Use generateText for full backend responses
             const { text } = await generateText({
@@ -104,7 +159,7 @@ export async function runAnalysis(analysisId: string, options: AnalysisOptions) 
               messages: [
                 {
                   role: 'user',
-                  content: promptDoc.text,
+                  content: filledPrompt,
                 },
               ],
             });
@@ -119,7 +174,7 @@ export async function runAnalysis(analysisId: string, options: AnalysisOptions) 
               {
                 p_analysis_run_id: analysisId,
                 p_provider: model.id,
-                p_raw_content: text,
+                p_response_text: text,
                 p_prompt_id: promptDoc.id,
               },
             );
