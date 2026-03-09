@@ -34,7 +34,7 @@
 
 #### **Phase 2: LLM Sampling Engine (Blind Share-of-Voice)**
 
-- [ ] **Express API: Orchestration Service**
+- [x] **Express API: Orchestration Service**
   - Implement `apps/api/src/services/samplingEngine.ts`.
   - Support **GPT-5.2**, **Claude 4.6**, and **Gemini 3.1**.
 - [ ] **The "Blind" Prompt Library**
