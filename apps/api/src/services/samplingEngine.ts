@@ -20,6 +20,10 @@ export interface AnalysisOptions {
  * Fill template placeholders with actual brand data
  */
 function fillTemplate(template: string, data: TemplateData): string {
+  if (!template || template.trim() === '') {
+    throw new Error('Template text is empty or undefined');
+  }
+
   let filled = template;
 
   Object.entries(data).forEach(([key, value]) => {
@@ -30,7 +34,13 @@ function fillTemplate(template: string, data: TemplateData): string {
   });
 
   // Remove any unfilled placeholders
-  filled = filled.replace(/{{[^}]+}}/g, '');
+  filled = filled.replace(/{{[^}]+}}/g, '').trim();
+
+  // Ensure we still have content after processing
+  if (!filled || filled === '') {
+    console.warn(`Template resulted in empty string. Original: "${template}"`);
+    return template; // Return original if processing resulted in empty string
+  }
 
   return filled;
 }
@@ -138,7 +148,10 @@ export async function runAnalysis(analysisId: string, options: AnalysisOptions) 
       models.map((model: ModelInstance) =>
         limit(async () => {
           try {
+            const filledPrompt = fillTemplate(promptDoc.template_text, templateData);
+            
             console.log(`[runAnalysis] Calling ${model.id} for prompt ${promptDoc.id}`);
+            console.log(`[runAnalysis] Filled prompt: "${filledPrompt.substring(0, 100)}..."`);
 
             // Use generateText for full backend responses
             const { text } = await generateText({
@@ -146,7 +159,7 @@ export async function runAnalysis(analysisId: string, options: AnalysisOptions) 
               messages: [
                 {
                   role: 'user',
-                  content: fillTemplate(promptDoc.template_text, templateData),
+                  content: filledPrompt,
                 },
               ],
             });

@@ -105,7 +105,11 @@ export async function triggerAnalysis(req: Request, res: Response) {
     const analysisId = analysisRun.id;
 
     // 5. Fire-and-Forget: Trigger the sampling engine WITHOUT await
-    runAnalysis(analysisId, { brand, competitors, models }).catch((error) => {
+    runAnalysis(analysisId, {
+      reportingSubjectId,
+      organizationId,
+      models,
+    }).catch((error) => {
       console.error(`Background analysis ${analysisId} failed:`, error);
       // The runAnalysis service already handles its own error persistence
     });

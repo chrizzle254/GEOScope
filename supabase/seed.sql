@@ -38,13 +38,13 @@ INSERT INTO public.organizations (name) VALUES ('Acme Inc.') ON CONFLICT (name) 
 -- and uses them to create the membership link.
 INSERT INTO public.organization_members (organization_id, user_id, role)
 SELECT 
-    (SELECT id FROM public.organizations WHERE name = 'Acme Inc.'),
-    (SELECT id FROM public.users WHERE auth_id = '00000000-0000-0000-0000-000000000001'),
+    (SELECT id FROM public.organizations WHERE name = 'Acme Inc.' LIMIT 1),
+    (SELECT id FROM public.users WHERE auth_id = '00000000-0000-0000-0000-000000000001' LIMIT 1),
     'owner'
 UNION ALL
 SELECT 
-    (SELECT id FROM public.organizations WHERE name = 'Acme Inc.'),
-    (SELECT id FROM public.users WHERE auth_id = '00000000-0000-0000-0000-000000000002'),
+    (SELECT id FROM public.organizations WHERE name = 'Acme Inc.' LIMIT 1),
+    (SELECT id FROM public.users WHERE auth_id = '00000000-0000-0000-0000-000000000002' LIMIT 1),
     'owner'
 ON CONFLICT (organization_id, user_id) DO NOTHING;
 
@@ -52,6 +52,7 @@ ON CONFLICT (organization_id, user_id) DO NOTHING;
 INSERT INTO public.reporting_subject (organization_id, name)
 SELECT id, 'Acme Website Builder'
 FROM public.organizations WHERE name = 'Acme Inc.'
+LIMIT 1
 ON CONFLICT (organization_id, name) DO NOTHING;
 
 -- Upsert competitors for 'Acme Website Builder'
@@ -59,7 +60,8 @@ WITH subject AS (
     SELECT id
     FROM public.reporting_subject
     WHERE name = 'Acme Website Builder'
-    AND organization_id = (SELECT id FROM public.organizations WHERE name = 'Acme Inc.')
+    AND organization_id = (SELECT id FROM public.organizations WHERE name = 'Acme Inc.' LIMIT 1)
+    LIMIT 1
 )
 INSERT INTO public.reporting_subject_competitors (reporting_subject_id, name)
 SELECT id, 'Webflow' FROM subject
