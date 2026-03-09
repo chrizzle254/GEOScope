@@ -33,5 +33,22 @@ export interface LLMProvider {
  */
 export interface Prompt {
   id: string;
-  text: string;
+  slug: string;
+  category: 'recommendation' | 'comparison' | 'use_case' | 'problem_solving';
+  template_text: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * Template data for filling prompt placeholders
+ */
+export interface TemplateData {
+  brand_name: string;
+  industry: string;
+  target_audience?: string;
+  competitor_1?: string;
+  competitor_2?: string;
+  competitor_3?: string;
 }
