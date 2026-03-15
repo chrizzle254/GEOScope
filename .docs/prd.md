@@ -23,6 +23,7 @@ GEO Scope is a SaaS platform providing brands with data-driven insights into how
 - **Input:** Brand name, industry, and up to 10 competitors.
 - **Orchestration:** `apps/api` (Express) to handle long-running LLM calls (~100 prompts) to avoid Vercel Serverless function timeouts.
 - **Providers:** OpenAI, Anthropic, and Google Gemini via Vercel AI SDK.
+- **Template Injection:** System prompts use placeholders (e.g., `{{brand_name}}`, `{{industry}}`) that are dynamically filled with brand metadata at runtime, enabling personalized analysis while maintaining prompt integrity.
 
 ### 3.3 Data Visualization Dashboard
 
@@ -63,6 +64,6 @@ The agent must respect the following structure:
 
 ## 7. Non-Goals
 
-- No custom prompt engineering by the user (Prompts are system-managed).
+- No custom prompt engineering by the user (Prompts are system-managed via template injection).
 - No real-time "Social Listening" (Analysis is batch/on-demand).
-- No multi-user organizations or team-sharing features.
+- No multi-user organizations or team-sharing features (MVP).

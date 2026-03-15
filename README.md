@@ -186,9 +186,9 @@ _Handles Stripe integration and subscription lifecycles._
 
 _System-only tables for LLM operations. Not accessible via Client SDKs._
 
-- **`llm_providers`**: Registry of available models (e.g., `gpt-4o`).
-- **`prompts`**: Versioned library of AI instructions.
-- **`llm_responses`**: Raw logs of LLM outputs for auditing.
+- **`llm_providers`**: Registry of available models (e.g., `gpt-4o`) with version tracking.
+- **`prompts`**: Template-based prompt library with placeholders (e.g., `{{brand_name}}`, `{{industry}}`). Each prompt has a `slug`, `category`, and `is_active` flag for system management.
+- **`llm_responses`**: Raw logs of LLM outputs for auditing, including `tokens_used` and `latency_ms` for performance tracking.
 
 - **System Status:** `Enabled`
 - **Workflow:** 1. Make changes to your local database (via Dashboard or SQL). 2. Run `supabase db diff -f <migration_name>` to capture changes. 3. Commit the resulting `.sql` file in `supabase/migrations/`.

@@ -37,7 +37,7 @@
 - [x] **Express API: Orchestration Service**
   - Implement `apps/api/src/services/samplingEngine.ts`.
   - Support **GPT-5.2**, **Claude 4.6**, and **Gemini 3.1**.
-- [ ] **The "Blind" Prompt Library**
+- [x] **The "Blind" Prompt Library**
   - Create `apps/api/src/lib/prompts.ts` with ~100 industry-specific questions.
   - **Rule:** These prompts must NOT mention the User's Brand.
 - [ ] **Mention Extraction Parser**
