@@ -1,4 +1,5 @@
-import { MentionResult, ParseOptions } from 'shared/src/types/analysis';
+import { MentionResult, ParseOptions } from '@geoscope/shared/types';
+
 
 function escapeRegex(str: string): string {
   // eslint-disable-next-line no-useless-escape

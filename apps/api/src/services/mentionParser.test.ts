@@ -1,6 +1,6 @@
 // This import will fail because the file doesn't exist yet.
 import { MentionParser } from './mentionParser';
-import type { ParseOptions } from 'shared/src/types/analysis';
+import type { ParseOptions } from '@geoscope/shared/types';
 
 describe('MentionParser', () => {
   it('should detect a simple brand mention', () => {
