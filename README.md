@@ -172,7 +172,7 @@ _Core application data. Access is governed by Organization membership._
 - **`reporting_subject`**: The primary entity being analyzed (e.g., a brand).
 - **`reporting_subject_competitors`**: Competitors linked to a subject.
 - **`analysis_runs`**: Lifecycle tracking for analysis jobs (`pending` → `completed`).
-- **`mentions`**: Specific data points, sentiment, and accuracy excerpts.
+- **`mentions`**: Stores parsed mention data from LLM responses, including `brand_mentioned`, `competitors_mentioned`, and contextual excerpts.
 - **`reporting_subject_metrics`**: Aggregated visibility and sentiment scores.
 
 #### 2. `billing` Schema

@@ -70,7 +70,7 @@ api/
 - **`reporting_subject`**: The target brand/product being tracked (includes `industry`, `target_audience`).
 - **`reporting_subject_competitors`**: A list of competitors associated with a brand.
 - **`analysis_runs`**: Tracks the execution status (pending, processing, completed, failed) of the sampling engine.
-- **`mentions`**: Stores results of individual LLM queries (brand presence, sentiment, excerpt, competitor mentions).
+- **`mentions`**: Stores the parsed results from a single LLM response. Includes `brand_mentioned` (boolean), `competitors_mentioned` (array), and excerpts for both the brand and competitors.
 - **`reporting_subject_metrics`**: High-level aggregated scores (Visibility, Accuracy, Sentiment) derived from an analysis run.
 
 ### 5.2 Internal Schema (System-Only)

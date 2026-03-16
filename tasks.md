@@ -32,7 +32,7 @@
 
 ---
 
-#### **Phase 2: LLM Sampling Engine (Blind Share-of-Voice)**
+#### **Phase 2: LLM Sampling Engine**
 
 - [x] **Express API: Orchestration Service**
   - Implement `apps/api/src/services/samplingEngine.ts`.
@@ -40,12 +40,10 @@
 - [x] **The "Blind" Prompt Library**
   - Create `apps/api/src/lib/prompts.ts` with ~100 industry-specific questions.
   - **Rule:** These prompts must NOT mention the User's Brand.
-- [ ] **Mention Extraction Parser**
-  - Build a regex or LLM-based utility to scan raw responses for `reporting_subject.name` and `competitors.name`.
-- [ ] **Data Persistence**
+- [x] **Mention Extraction Parser**
+  - **Session Note:** Implemented a Regex-based `MentionParser` using TDD. The `samplingEngine` was refactored to use this parser and persist results to a newly defined `public.mentions` schema.
+- [x] **Data Persistence**
   - Record `mentions`: Was the brand present? (Boolean)
-  - Record `sentiment`: How was the brand described? (Post-analysis only)
-  - Update `reporting_subject_metrics` for Share of Voice (SoV) calculation.
 
 ---
 
@@ -81,3 +79,11 @@
   - Implement PDF/CSV generation in `apps/api/src/services/reportService.ts`.
 - [ ] **Automated Scheduler**
   - Set up cron job to trigger periodic re-analysis.
+  
+
+---
+
+#### **Future Ideas**
+
+- Record `sentiment`: How was the brand described? (Post-analysis only)
+- Update `reporting_subject_metrics` for Share of Voice (SoV) calculation.
