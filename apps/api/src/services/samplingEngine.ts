@@ -5,7 +5,14 @@ import { google } from '@ai-sdk/google';
 import pLimit from 'p-limit';
 import { supabaseAdmin } from '../lib/supabase';
 import { MentionParser } from './mentionParser';
-import { SupportedModel, LLMProvider, Prompt, TemplateData, ParseOptions, MentionResult } from '@geoscope/shared/types';
+import {
+  SupportedModel,
+  LLMProvider,
+  Prompt,
+  TemplateData,
+  ParseOptions,
+  MentionResult,
+} from '@geoscope/shared/types';
 import type { LanguageModel } from 'ai';
 
 // Restrict concurrency to 10 simultaneous LLM calls
@@ -57,7 +64,10 @@ function fillTemplate(template: string, data: TemplateData): string {
  * @param options - The analysis configuration containing brand, competitors, and selected models.
  */
 async function persistTaskError(runId: string, promptId: string, modelId: string, error: Error) {
-  console.error(`[persistTaskError] Logging failure for run ${runId}, prompt ${promptId}, model ${modelId}:`, error.message);
+  console.error(
+    `[persistTaskError] Logging failure for run ${runId}, prompt ${promptId}, model ${modelId}:`,
+    error.message,
+  );
   // Use the existing RPC to log the error
   await supabaseAdmin.rpc('insert_llm_response', {
     p_analysis_run_id: runId,
@@ -106,12 +116,12 @@ async function persistTaskSuccess(
   });
 
   if (mentionError) {
-    throw new Error(`Failed to save to public.mentions for response ${responseId}: ${mentionError.message}`);
+    throw new Error(
+      `Failed to save to public.mentions for response ${responseId}: ${mentionError.message}`,
+    );
   }
 
-   console.log(
-    `[persistTaskSuccess] Saved mention data for prompt ${promptId}.`,
-  );
+  console.log(`[persistTaskSuccess] Saved mention data for prompt ${promptId}.`);
 }
 
 export async function runAnalysis(analysisId: string, options: AnalysisOptions) {
@@ -214,23 +224,30 @@ export async function runAnalysis(analysisId: string, options: AnalysisOptions) 
               model: model.instance,
               messages: [{ role: 'user', content: filledPrompt }],
             });
-            console.log(`[runAnalysis] ${model.id} responded for prompt ${promptDoc.id}, length: ${text.length}`);
+            console.log(
+              `[runAnalysis] ${model.id} responded for prompt ${promptDoc.id}, length: ${text.length}`,
+            );
 
-            console.log(`[runAnalysis] Parsing response from ${model.id} for prompt ${promptDoc.id}...`);
+            console.log(
+              `[runAnalysis] Parsing response from ${model.id} for prompt ${promptDoc.id}...`,
+            );
             const parseOptions: ParseOptions = {
               brandName: brand.name,
               brandAliases: brand.aliases || [],
-              competitorMap: brand.reporting_subject_competitors.reduce((acc: any, c: any) => {
-                acc[c.name] = c.aliases || [];
-                return acc;
-              }, {}),
+              competitorMap: brand.reporting_subject_competitors.reduce(
+                (acc: Record<string, string[]>, c: { name: string; aliases: string[] | null }) => {
+                  acc[c.name] = c.aliases || [];
+                  return acc;
+                },
+                {},
+              ),
               responseText: text,
             };
             const mentionResult = MentionParser.parse(parseOptions);
 
             await persistTaskSuccess(analysisId, promptDoc.id, model.id, text, mentionResult);
-
-          } catch (error: any) {
+          } catch (e: unknown) {
+            const error = e instanceof Error ? e : new Error(String(e));
             await persistTaskError(analysisId, promptDoc.id, model.id, error);
           }
         }),

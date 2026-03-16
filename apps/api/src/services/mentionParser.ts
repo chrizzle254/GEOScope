@@ -1,6 +1,5 @@
 import { MentionResult, ParseOptions } from '@geoscope/shared/types';
 
-
 function escapeRegex(str: string): string {
   // eslint-disable-next-line no-useless-escape
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');

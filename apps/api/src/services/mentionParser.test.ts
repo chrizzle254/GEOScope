@@ -28,7 +28,12 @@ describe('MentionParser', () => {
   });
 
   it('should not match partial words due to word boundaries', () => {
-    const options: ParseOptions = { brandName: 'Acme', brandAliases: [], competitorMap: {}, responseText: 'The new AcmeCorp building is now open.' };
+    const options: ParseOptions = {
+      brandName: 'Acme',
+      brandAliases: [],
+      competitorMap: {},
+      responseText: 'The new AcmeCorp building is now open.',
+    };
     const result = MentionParser.parse(options);
     expect(result.brandMentioned).toBe(false);
   });
@@ -38,7 +43,8 @@ describe('MentionParser', () => {
       brandName: 'Acme Corp',
       brandAliases: [],
       competitorMap: { 'Global Megatech': ['GMT'], 'Universal Imports': [] },
-      responseText: 'While Acme is good, products from GMT and Universal Imports are also top-tier.',
+      responseText:
+        'While Acme is good, products from GMT and Universal Imports are also top-tier.',
     };
     const result = MentionParser.parse(options);
     expect(result.competitorsMentioned).toHaveLength(2);
@@ -60,4 +66,3 @@ describe('MentionParser', () => {
     expect(result.confidence).toBe('low');
   });
 });
-
