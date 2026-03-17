@@ -79,7 +79,6 @@
   - Implement PDF/CSV generation in `apps/api/src/services/reportService.ts`.
 - [ ] **Automated Scheduler**
   - Set up cron job to trigger periodic re-analysis.
-  
 
 ---
 
