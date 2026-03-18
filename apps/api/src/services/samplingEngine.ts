@@ -4,7 +4,15 @@ import { anthropic } from '@ai-sdk/anthropic';
 import { google } from '@ai-sdk/google';
 import pLimit from 'p-limit';
 import { supabaseAdmin } from '../lib/supabase';
-import { SupportedModel, LLMProvider, Prompt, TemplateData } from '@geoscope/shared/types';
+import { MentionParser } from './mentionParser';
+import {
+  SupportedModel,
+  LLMProvider,
+  Prompt,
+  TemplateData,
+  ParseOptions,
+  MentionResult,
+} from '@geoscope/shared/types';
 import type { LanguageModel } from 'ai';
 
 // Restrict concurrency to 10 simultaneous LLM calls
@@ -55,6 +63,67 @@ function fillTemplate(template: string, data: TemplateData): string {
  * @param analysisId - The UUID of the analysis run to execute.
  * @param options - The analysis configuration containing brand, competitors, and selected models.
  */
+async function persistTaskError(runId: string, promptId: string, modelId: string, error: Error) {
+  console.error(
+    `[persistTaskError] Logging failure for run ${runId}, prompt ${promptId}, model ${modelId}:`,
+    error.message,
+  );
+  // Use the existing RPC to log the error
+  await supabaseAdmin.rpc('insert_llm_response', {
+    p_analysis_run_id: runId,
+    p_provider: modelId,
+    p_prompt_id: promptId,
+    p_response_text: `Task Error: ${error.message}`,
+    p_is_error: true, // Assuming the RPC function is designed to handle this parameter
+  });
+}
+
+async function persistTaskSuccess(
+  runId: string,
+  promptId: string,
+  modelId: string,
+  rawResponse: string,
+  mentionData: MentionResult,
+) {
+  // 1. Insert into internal.llm_responses via the existing RPC function
+  const { data: responseId, error: responseLogError } = await supabaseAdmin.rpc(
+    'insert_llm_response',
+    {
+      p_analysis_run_id: runId,
+      p_provider: modelId,
+      p_response_text: rawResponse,
+      p_prompt_id: promptId,
+    },
+  );
+
+  if (responseLogError || !responseId) {
+    throw new Error(`Failed to log via rpc('insert_llm_response'): ${responseLogError?.message}`);
+  }
+
+  console.log(
+    `[persistTaskSuccess] Saved raw response via RPC for prompt ${promptId}, response ID: ${responseId}`,
+  );
+
+  // 2. Insert into public.mentions, using the ID returned from the RPC
+  const { error: mentionError } = await supabaseAdmin.from('mentions').insert({
+    run_id: runId,
+    response_id: responseId, // Use the ID from the RPC call
+    brand_mentioned: mentionData.brandMentioned,
+    competitors_mentioned: mentionData.competitorsMentioned,
+    excerpt_brand: mentionData.excerpts.brand,
+    excerpt_competitors: mentionData.excerpts.competitors || {},
+    confidence: mentionData.confidence,
+  });
+
+  if (mentionError) {
+    throw new Error(
+      `Failed to save to public.mentions for response ${responseId}: ${mentionError.message}`,
+    );
+  }
+
+  console.log(`[persistTaskSuccess] Saved mention data for prompt ${promptId}.`);
+}
+
 export async function runAnalysis(analysisId: string, options: AnalysisOptions) {
   console.log(`[runAnalysis] Starting analysis ${analysisId} with options:`, options);
 
@@ -149,53 +218,37 @@ export async function runAnalysis(analysisId: string, options: AnalysisOptions) 
         limit(async () => {
           try {
             const filledPrompt = fillTemplate(promptDoc.template_text, templateData);
-
             console.log(`[runAnalysis] Calling ${model.id} for prompt ${promptDoc.id}`);
-            console.log(`[runAnalysis] Filled prompt: "${filledPrompt.substring(0, 100)}..."`);
 
-            // Use generateText for full backend responses
             const { text } = await generateText({
               model: model.instance,
-              messages: [
-                {
-                  role: 'user',
-                  content: filledPrompt,
-                },
-              ],
+              messages: [{ role: 'user', content: filledPrompt }],
             });
-
             console.log(
               `[runAnalysis] ${model.id} responded for prompt ${promptDoc.id}, length: ${text.length}`,
             );
 
-            // Atomic Write to the persistence layer via RPC (internal schema)
-            const { data: responseId, error: insertError } = await supabaseAdmin.rpc(
-              'insert_llm_response',
-              {
-                p_analysis_run_id: analysisId,
-                p_provider: model.id,
-                p_response_text: text,
-                p_prompt_id: promptDoc.id,
-              },
-            );
-
-            if (insertError) {
-              console.error(
-                `[runAnalysis] Failed to save response from ${model.id} for prompt ${promptDoc.id}:`,
-                insertError,
-              );
-              throw insertError;
-            }
-
             console.log(
-              `[runAnalysis] Saved response from ${model.id} for prompt ${promptDoc.id}, response ID: ${responseId}`,
+              `[runAnalysis] Parsing response from ${model.id} for prompt ${promptDoc.id}...`,
             );
+            const parseOptions: ParseOptions = {
+              brandName: brand.name,
+              brandAliases: brand.aliases || [],
+              competitorMap: brand.reporting_subject_competitors.reduce(
+                (acc: Record<string, string[]>, c: { name: string; aliases: string[] | null }) => {
+                  acc[c.name] = c.aliases || [];
+                  return acc;
+                },
+                {},
+              ),
+              responseText: text,
+            };
+            const mentionResult = MentionParser.parse(parseOptions);
 
-            // TODO: Trigger extraction logic here (Task: "Mention Extraction Parser")
-          } catch (error) {
-            // Log failure but allow the rest of the queue to proceed
-            console.error(`Provider ${model.id} failed for prompt ${promptDoc.id}:`, error);
-            // Optional: Record the failure in a dedicated log table
+            await persistTaskSuccess(analysisId, promptDoc.id, model.id, text, mentionResult);
+          } catch (e: unknown) {
+            const error = e instanceof Error ? e : new Error(String(e));
+            await persistTaskError(analysisId, promptDoc.id, model.id, error);
           }
         }),
       ),
