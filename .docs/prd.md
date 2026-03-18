@@ -20,7 +20,7 @@ GEO Scope is a SaaS platform providing brands with data-driven insights into how
 
 ### 3.2 Brand Analysis Engine (Sampling)
 
-- **Input:** Brand name, industry, and up to 10 competitors.
+- **Input:** Brand name, industry, competitors, and search context.
 - **Orchestration:** `apps/api` (Express) to handle long-running LLM calls (~100 prompts) to avoid Vercel Serverless function timeouts.
 - **Providers:** OpenAI, Anthropic, and Google Gemini via Vercel AI SDK.
 - **Template Injection:** System prompts use placeholders (e.g., `{{brand_name}}`, `{{industry}}`) that are dynamically filled with brand metadata at runtime, enabling personalized analysis while maintaining prompt integrity.
