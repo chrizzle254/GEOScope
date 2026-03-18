@@ -56,6 +56,7 @@ export async function authenticateUser(req: Request, res: Response, next: NextFu
     // 1. Verify JWT via remote JWKS (handles ES256/RS256/HS256)
     const { payload } = await jwtVerify(token, JWKS, {
       issuer: SUPABASE_AUTH_URL,
+      audience: 'authenticated', // <-- FIX: Add required audience
     });
 
     const decoded = payload as SupabaseJwtPayload;
@@ -76,12 +77,17 @@ export async function authenticateUser(req: Request, res: Response, next: NextFu
       .eq('auth_id', decoded.sub)
       .single();
 
+    if (contextError || !data) { // <-- FIX: Check for null data
+      console.error('Auth Context Resolution Failed:', contextError?.message || 'User not found');
+      return res.status(403).json({ error: 'User profile or organization context not found.' });
+    }
+
     // Type casting the Supabase response to our interface
     const context = data as unknown as UserOrgContext;
 
-    if (contextError || !context || !context.organization_members?.[0]) {
-      console.error('Auth Context Resolution Failed:', contextError?.message || 'No org mapping');
-      return res.status(403).json({ error: 'User profile or organization context not found.' });
+    if (!context.organization_members?.[0]) { // Simplified check
+      console.error('Auth Context Resolution Failed:', 'No org mapping');
+      return res.status(403).json({ error: 'User is not a member of any organization.' });
     }
 
     const membership = context.organization_members[0];
