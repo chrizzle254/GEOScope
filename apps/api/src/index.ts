@@ -2,8 +2,8 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import { env } from './env';
 import { authenticateUser } from './middleware/auth';
-import { getBrands, createBrand } from './controllers/brandController';
 import { supabaseAdmin } from './lib/supabase';
+import brandRoutes from './routes/brandRoutes';
 import analysisRoutes from './routes/analysisRoutes';
 
 const app = express();
@@ -14,14 +14,9 @@ app.get('/health', (_req: Request, res: Response) => {
   res.json({ status: 'ok' });
 });
 
-// --- Analysis Routes ---
-app.use('/api/v1/analyses', analysisRoutes);
-// --- End Analysis Routes ---
-
-// --- Brand Routes ---
-app.get('/brands', authenticateUser, getBrands);
-app.post('/brands', authenticateUser, createBrand);
-// --- End Brand Routes ---
+// Modular, prefixed routes
+app.use('/api/brands', brandRoutes);
+app.use('/api/analyses', analysisRoutes);
 
 // Protected: Get current user profile
 app.get('/users/me', authenticateUser, async (req, res) => {
