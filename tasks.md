@@ -142,12 +142,13 @@
 
 ##### **3.5 — Account Page**
 
-- [ ] **Account / Billing Form** (`apps/web/src/app/account/page.tsx`)
+- [x] **Account / Billing Form** (`apps/web/src/app/account/page.tsx`)
   - Heading: `"DO YOU TAKE IT SERIOUSLY?"` in Roboto Mono.
   - Labelled input fields: `CREDIT CARD`, `NAME`, `ADDRESS`.
   - Disclaimer text: `"You won't be charged anything. We just want to verify that you are not spamming."` (small, `#757575`).
   - Integrate Stripe Elements for the credit card field.
   - `"Save"` and `"Back"` buttons.
+  - **Session Note:** Installed `@stripe/stripe-js` + `@stripe/react-stripe-js`. Page wraps with `<Elements>` provider; `CardElement` styled to match design system via Stripe's style API. `stripePromise` is `null` when `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` is unset (graceful degradation). Save is a stub — shows `sonner` toast. `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` added to `apps/web/.env.example`.
 
 ---
 
