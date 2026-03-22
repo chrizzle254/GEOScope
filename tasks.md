@@ -122,18 +122,21 @@
 
 ##### **3.4 — Analysis Pages**
 
-- [ ] **LLM Comparison Page** (`apps/web/src/app/dashboard/llm-comparison/page.tsx`)
+- [x] **LLM Comparison Page** (`apps/web/src/app/dashboard/llm-comparison/page.tsx`)
   - Table or card grid comparing mention rates per LLM provider (OpenAI, Anthropic, Gemini).
   - Data: query `public.mentions` grouped by `llm_provider`.
   - Use Recharts `BarChart` for visual comparison.
-- [ ] **Competitors Page** (`apps/web/src/app/dashboard/competitors/page.tsx`)
+  - **Session Note:** Added `GET /api/v1/analyses` and `GET /api/v1/analyses/:runId/mentions` API endpoints. New migration `20260322000000_add_rpc_get_mentions_with_provider.sql` provides a `SECURITY DEFINER` RPC that joins `public.mentions` with `internal.llm_responses` to expose `llm_provider`. Page shows run summary stats, BarChart with per-provider colors, and a summary table. Empty states for no brand / no completed runs. 5 unit tests added to `apps/api/src/services/analysisUtils.test.ts`.
+- [x] **Competitors Page** (`apps/web/src/app/dashboard/competitors/page.tsx`)
   - Share of Voice chart: brand vs. each competitor's mention frequency.
   - Data from `public.mentions` → `competitors_mentioned` array aggregation.
   - Use Recharts `PieChart` or `BarChart`.
-- [ ] **Convo Context Page** (`apps/web/src/app/dashboard/convo-context/page.tsx`)
+  - **Session Note:** Horizontal `BarChart layout="vertical"` chosen for readability of entity names. Brand bar uses `#1E1E1E`, competitors use `#757575`. Inline `%` labels on each bar via custom `BarLabel`. Summary table with "you" badge on brand row. `computeSoV` tests added to `analysisUtils.test.ts` (10 total).
+- [x] **Convo Context Page** (`apps/web/src/app/dashboard/convo-context/page.tsx`)
   - List of raw LLM response excerpts where the brand was mentioned.
   - Display `brand_excerpt` and `competitors_excerpt` fields from `public.mentions`.
   - Pagination or infinite scroll for large result sets.
+  - **Session Note:** Client-side pagination (PAGE_SIZE=10). Filters to `brand_mentioned=true`. Each card shows provider badge, confidence level, brand excerpt (left border `#1E1E1E`), competitor excerpts (left border `#757575`). Prev/Next controls with disabled states.
 
 ---
 
@@ -153,8 +156,9 @@
 - [x] **Brand Service** (`apps/web/src/services/brandService.ts`)
   - `getBrand()`, `createBrand()`, `updateBrand()` — wraps Express API calls with Supabase JWT in `Authorization` header.
   - **Session Note:** Implemented in Phase 3.2 alongside `apiClient.ts`.
-- [ ] **Analysis Service** (`apps/web/src/services/analysisService.ts`)
+- [x] **Analysis Service** (`apps/web/src/services/analysisService.ts`)
   - `triggerAnalysis()`, `getAnalysisRuns()`, `getMentions()` — fetches from Express API.
+  - **Session Note:** Implemented in Phase 3.4 alongside the LLM Comparison page. New types in `apps/web/src/types/analysis.ts`.
 - [ ] **React Query / SWR Setup**
   - Add `@tanstack/react-query` provider in `apps/web/src/app/layout.tsx`.
   - Create typed query hooks: `useBrand()`, `useAnalysisRuns()`, `useMentions()`.
