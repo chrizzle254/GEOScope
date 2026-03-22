@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { getBrands } from '@/services/brandService';
+import { getBrands, updateCompetitors } from '@/services/brandService';
 import { Competitor } from '@/types/brand';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,6 +12,7 @@ export default function CompetitorsPage() {
   const [competitors, setCompetitors] = useState<Competitor[]>([]);
   const [newName, setNewName] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     getBrands()
@@ -37,14 +38,26 @@ export default function CompetitorsPage() {
       toast.error('Maximum 10 competitors allowed.');
       return;
     }
-    // Optimistic local add — will be persisted when brand is saved via settings page
     setCompetitors((prev) => [...prev, { id: crypto.randomUUID(), name: trimmed }]);
     setNewName('');
-    toast.success(`${trimmed} added.`);
   };
 
   const handleRemove = (id: string) => {
     setCompetitors((prev) => prev.filter((c) => c.id !== id));
+  };
+
+  const handleSave = async () => {
+    if (!brandId) return;
+    setIsSaving(true);
+    try {
+      const saved = await updateCompetitors(brandId, competitors.map((c) => c.name));
+      setCompetitors(saved);
+      toast.success('Competitors saved.');
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Failed to save competitors.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   if (isLoading) {
@@ -106,6 +119,11 @@ export default function CompetitorsPage() {
           </Button>
         </div>
       )}
+
+      {/* Save */}
+      <Button onClick={handleSave} disabled={isSaving} className="self-start">
+        {isSaving ? 'Saving...' : 'Save'}
+      </Button>
     </div>
   );
 }

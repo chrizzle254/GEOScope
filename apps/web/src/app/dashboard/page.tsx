@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { toast } from 'sonner';
 import { getBrands } from '@/services/brandService';
+import { triggerAnalysis } from '@/services/analysisService';
 import { Brand } from '@/types/brand';
 
 export default function DashboardPage() {
@@ -77,6 +79,24 @@ function EmptyState() {
 }
 
 function BrandOverview({ brand }: { brand: Brand }) {
+  const [isRunning, setIsRunning] = useState(false);
+
+  async function handleRunAnalysis() {
+    setIsRunning(true);
+    try {
+      const result = await triggerAnalysis({
+        brand: brand.name,
+        industry: brand.industry,
+        competitors: brand.competitors.map((c) => c.name),
+      });
+      toast.success(`Analysis started — ID #${result.analysisId.slice(0, 8)}`);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Failed to start analysis.');
+    } finally {
+      setIsRunning(false);
+    }
+  }
+
   return (
     <div className="flex flex-col gap-8">
       {/* Brand header */}
@@ -120,9 +140,11 @@ function BrandOverview({ brand }: { brand: Brand }) {
         </p>
         <button
           type="button"
-          className="border-4 border-foreground bg-foreground px-6 py-3 text-sm font-medium text-background transition-colors hover:bg-background hover:text-foreground"
+          onClick={handleRunAnalysis}
+          disabled={isRunning}
+          className="border-4 border-foreground bg-foreground px-6 py-3 text-sm font-medium text-background transition-colors hover:bg-background hover:text-foreground disabled:opacity-50"
         >
-          Run analysis
+          {isRunning ? 'Starting...' : 'Run analysis'}
         </button>
       </div>
     </div>

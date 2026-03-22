@@ -73,6 +73,70 @@ export async function updateBrand(req: Request, res: Response) {
   }
 }
 
+export async function updateCompetitors(req: Request, res: Response) {
+  const organization_id = req.user!.organization_id;
+  const { id } = req.params;
+  const { competitors } = req.body;
+
+  if (!Array.isArray(competitors)) {
+    return res.status(400).json({ error: 'competitors must be an array of strings.' });
+  }
+
+  if (competitors.length > 10) {
+    return res.status(400).json({ error: 'Maximum 10 competitors allowed.' });
+  }
+
+  try {
+    // Verify ownership
+    const { data: subject, error: subjectError } = await supabaseAdmin
+      .from('reporting_subject')
+      .select('id')
+      .eq('id', id)
+      .eq('organization_id', organization_id)
+      .single();
+
+    if (subjectError || !subject) {
+      return res.status(404).json({ error: 'Brand not found.' });
+    }
+
+    // Replace: delete all existing, then insert new
+    const { error: deleteError } = await supabaseAdmin
+      .from('reporting_subject_competitors')
+      .delete()
+      .eq('reporting_subject_id', id);
+
+    if (deleteError) {
+      console.error('Error deleting competitors:', deleteError);
+      return res.status(500).json({ error: 'Failed to update competitors.' });
+    }
+
+    let newCompetitors: Array<{ id: string; name: string }> = [];
+    if (competitors.length > 0) {
+      const records = competitors.map((name: string) => ({
+        reporting_subject_id: id,
+        name: String(name).trim(),
+      }));
+
+      const { data, error: insertError } = await supabaseAdmin
+        .from('reporting_subject_competitors')
+        .insert(records)
+        .select('id, name');
+
+      if (insertError) {
+        console.error('Error inserting competitors:', insertError);
+        return res.status(500).json({ error: 'Failed to save competitors.' });
+      }
+
+      newCompetitors = data ?? [];
+    }
+
+    return res.status(200).json({ competitors: newCompetitors });
+  } catch (err) {
+    console.error('Unexpected error in updateCompetitors:', err);
+    return res.status(500).json({ error: 'Internal server error.' });
+  }
+}
+
 export async function createBrand(req: Request, res: Response) {
   const organization_id = req.user!.organization_id;
   const { name, industry, competitors } = req.body;
