@@ -1,66 +1,82 @@
 -- seed auth users
-insert into auth.users (id, email, encrypted_password, role, created_at, email_confirmed_at,aud)
-values 
+-- All token columns must be '' (not NULL) for GoTrue compatibility.
+-- instance_id must be '00000000-0000-0000-0000-000000000000' (the GoTrue instance UUID).
+insert into auth.users (
+  instance_id, id, email, encrypted_password, role, aud,
+  email_confirmed_at, created_at, updated_at,
+  confirmation_token, recovery_token, email_change_token_new, email_change,
+  email_change_token_current, phone_change, phone_change_token, reauthentication_token
+)
+values
   (
+    '00000000-0000-0000-0000-000000000000',
     '00000000-0000-0000-0000-000000000001',
     'jeffrey@expl.com',
-    '$2a$10$vfMSc1Y9gmzhL1L2h4RFb.J93vVdVSb0dF/WlDAsPOX.D8h16BVGy',  -- pw to enter: 123456 
+    crypt('123456', gen_salt('bf')),  -- pw: 123456
     'authenticated',
-    now(),
-    now(),
-    'authenticated'
+    'authenticated',
+    now(), now(), now(),
+    '', '', '', '', '', '', '', ''
   ),
   (
+    '00000000-0000-0000-0000-000000000000',
     '00000000-0000-0000-0000-000000000002',
     'test@expl.com',
-    '$2a$10$vfMSc1Y9gmzhL1L2h4RFb.J93vVdVSb0dF/WlDAsPOX.D8h16BVGy',  -- pw to enter: 123456 
+    crypt('123456', gen_salt('bf')),  -- pw: 123456
     'authenticated',
-    now(),
-    now(),
-    'authenticated'
+    'authenticated',
+    now(), now(), now(),
+    '', '', '', '', '', '', '', ''
   );
 
--- then insert into public.users
-insert into users (auth_id, full_name)
-values 
-  ('00000000-0000-0000-0000-000000000001', 'Jeffrey'),
-  ('00000000-0000-0000-0000-000000000002', 'Test User');
+-- auth.identities rows are required for GoTrue to authenticate users
+insert into auth.identities (id, user_id, identity_data, provider, provider_id, created_at, updated_at, last_sign_in_at)
+values
+  (
+    gen_random_uuid(),
+    '00000000-0000-0000-0000-000000000001',
+    '{"sub":"00000000-0000-0000-0000-000000000001","email":"jeffrey@expl.com"}',
+    'email',
+    '00000000-0000-0000-0000-000000000001',
+    now(), now(), now()
+  ),
+  (
+    gen_random_uuid(),
+    '00000000-0000-0000-0000-000000000002',
+    '{"sub":"00000000-0000-0000-0000-000000000002","email":"test@expl.com"}',
+    'email',
+    '00000000-0000-0000-0000-000000000002',
+    now(), now(), now()
+  );
+
+-- NOTE: The trigger `on_auth_user_created` (migration 20260305060107) automatically creates
+-- a public.users profile, a default organization, and an owner membership for each new auth user.
+-- We do NOT manually insert into public.users or create organizations here.
 
 --
 -- Seed data for Brand Management (Phase 1)
 --
+-- Add a reporting subject to jeffrey@expl.com's auto-created organization.
 
--- Upsert 'Acme Inc.' organization
-INSERT INTO public.organizations (name) VALUES ('Acme Inc.') ON CONFLICT (name) DO NOTHING;
-
--- Grant ownership of 'Acme Inc.' to the test users
--- This query finds the organization's ID and the user's ID from public.users
--- and uses them to create the membership link.
-INSERT INTO public.organization_members (organization_id, user_id, role)
-SELECT 
-    (SELECT id FROM public.organizations WHERE name = 'Acme Inc.' LIMIT 1),
-    (SELECT id FROM public.users WHERE auth_id = '00000000-0000-0000-0000-000000000001' LIMIT 1),
-    'owner'
-UNION ALL
-SELECT 
-    (SELECT id FROM public.organizations WHERE name = 'Acme Inc.' LIMIT 1),
-    (SELECT id FROM public.users WHERE auth_id = '00000000-0000-0000-0000-000000000002' LIMIT 1),
-    'owner'
-ON CONFLICT (organization_id, user_id) DO NOTHING;
-
--- Upsert the reporting subject 'Acme Website Builder' for 'Acme Inc.'
-INSERT INTO public.reporting_subject (organization_id, name)
-SELECT id, 'Acme Website Builder'
-FROM public.organizations WHERE name = 'Acme Inc.'
+INSERT INTO public.reporting_subject (organization_id, name, industry)
+SELECT
+    om.organization_id,
+    'Acme Website Builder',
+    'Website Builder'
+FROM public.organization_members om
+JOIN public.users u ON u.id = om.user_id
+WHERE u.auth_id = '00000000-0000-0000-0000-000000000001'
 LIMIT 1
 ON CONFLICT (organization_id, name) DO NOTHING;
 
--- Upsert competitors for 'Acme Website Builder'
+-- Add competitors for 'Acme Website Builder'
 WITH subject AS (
-    SELECT id
-    FROM public.reporting_subject
-    WHERE name = 'Acme Website Builder'
-    AND organization_id = (SELECT id FROM public.organizations WHERE name = 'Acme Inc.' LIMIT 1)
+    SELECT rs.id
+    FROM public.reporting_subject rs
+    JOIN public.organization_members om ON om.organization_id = rs.organization_id
+    JOIN public.users u ON u.id = om.user_id
+    WHERE u.auth_id = '00000000-0000-0000-0000-000000000001'
+    AND rs.name = 'Acme Website Builder'
     LIMIT 1
 )
 INSERT INTO public.reporting_subject_competitors (reporting_subject_id, name)
