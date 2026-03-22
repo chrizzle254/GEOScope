@@ -55,76 +55,68 @@
 
 ##### **3.0 — Design System & Foundation**
 
-- [ ] **Tailwind Theme**
-  - Extend `tailwind.config.ts` with brand color tokens: `brand-black: #1E1E1E`, `brand-gray: #757575`, `brand-muted: #D9D9D9`.
-  - Add `borderWidth: { DEFAULT: '4px' }` and `borderRadius: { sm: '3px', md: '6px' }` tokens.
-- [ ] **Typography**
-  - Install and configure **Roboto Mono** via `next/font/google` in `apps/web/src/app/layout.tsx`.
-  - Set as the default `font-sans` in Tailwind config.
-- [ ] **Sidebar Component** (`apps/web/src/components/shared/Sidebar.tsx`)
-  - Logo mark: `"GEO Visibility 🤖"` in Roboto Mono.
-  - Two nav sections with uppercase labels: `ANALYSIS` (Home, LLM comparison, Competitors, Convo context) and `CONFIG` (Settings, Account).
-  - Active link: `#1E1E1E` text + left border indicator. Inactive: `#757575`.
-  - Use Next.js `usePathname()` for active state detection.
-- [ ] **Dashboard Shell Layout** (`apps/web/src/app/dashboard/layout.tsx`)
-  - Fixed sidebar (left) + scrollable main content area.
-  - Wrap all `/dashboard`, `/settings`, and `/account` routes in this layout.
+- [x] **Tailwind Theme**
+  - Updated `globals.css` (Tailwind v4 CSS-based config): brand color tokens via CSS custom properties. `--radius: 0.1875rem` (3px). `--border` and `--input` mapped to `#757575`. `--primary` mapped to `#1E1E1E`.
+- [x] **Typography**
+  - Roboto Mono loaded via `next/font/google` in `layout.tsx`. CSS variable `--font-roboto-mono` referenced in `@theme inline` as `--font-sans` and `--font-mono`.
+- [x] **Sidebar Component** (`apps/web/src/components/shared/Sidebar.tsx`)
+  - Logo, ANALYSIS and CONFIG nav sections, active state via `usePathname()`. 4px right border.
+- [x] **Dashboard Shell Layout** (`apps/web/src/app/dashboard/layout.tsx`)
+  - Fixed sidebar + scrollable `<main>`.
+- [x] **shadcn primitives updated** — `Input` (4px border, h-12), `Button` (4px border, brutalist variants).
+  - **Session Note:** Tailwind v4 uses CSS-only config; no `tailwind.config.ts` needed. All color tokens set in `globals.css`.
+- [x] **AppLayout** (`apps/web/src/components/shared/AppLayout.tsx`) — shared sidebar shell used by all authenticated layouts.
 
 ---
 
 ##### **3.1 — Auth Pages**
 
-- [ ] **Login Page** (`apps/web/src/app/(auth)/login/page.tsx`)
-  - Discard placeholder. Rebuild with brutalist mono style: Roboto Mono, 4px borders, white background.
-  - Fields: Email, Password. CTA: "Login" button (dark fill, `#757575` border).
-  - Link to sign-up and forgot-password routes.
-- [ ] **Sign-Up Page** (`apps/web/src/app/(auth)/sign-up/page.tsx`)
-  - Same design system as login.
-  - Fields: Email, Password, Confirm Password.
-- [ ] **Forgot Password Page** (`apps/web/src/app/(auth)/forgot-password/page.tsx`)
-  - Single email field + submit CTA.
+- [x] **Login Page** (`apps/web/src/app/auth/login/page.tsx`)
+  - Rebuilt: logo, uppercase heading, Roboto Mono, 4px border inputs, dark filled CTA. Supabase logic kept intact. Redirects to `/dashboard`.
+- [x] **Sign-Up Page** (`apps/web/src/app/auth/sign-up/page.tsx`)
+  - Rebuilt to match login design. Redirects to `/auth/sign-up-success`.
+- [x] **Forgot Password Page** (`apps/web/src/app/auth/forgot-password/page.tsx`)
+  - Single email field + inline success state (no page change).
+- [x] **Sign-Up Success Page** — Rebuilt without Card, matches brutalist style.
+  - **Session Note:** All Supabase auth logic preserved; only markup/styles replaced.
 
 ---
 
 ##### **3.2 — Home / Dashboard**
 
-- [ ] **Empty State** (`apps/web/src/app/dashboard/page.tsx`)
-  - When no brand is configured: display `"Setup brand to see mentions of LLM"` message with a `"Look up brand"` CTA button that routes to `/settings`.
-  - Include a small brand placeholder icon/box.
-- [ ] **Populated State**
-  - Brand name + metadata displayed in a summary header.
-  - Visibility Score metric card (percentage of LLM mentions).
-  - Placeholder sections for LLM comparison, competitor mentions, sentiment trend (to be fleshed out in 3.4).
-  - Wire up data fetching from `GET /brands` and `GET /analysis-runs` API endpoints.
+- [x] **Empty State** (`apps/web/src/app/dashboard/page.tsx`)
+  - "Setup brand to see mentions of LLM" + "Look up brand" CTA → `/settings`.
+- [x] **Populated State**
+  - Brand header (name + industry + competitor chips).
+  - Three metric placeholder cards (Visibility Score, Share of Voice, Sentiment) with `—` until analysis runs.
+  - "Run analysis" CTA stub.
+- [x] **Foundation**
+  - `apps/web/src/types/brand.ts` — Brand, Competitor, CreateBrandInput interfaces.
+  - `apps/web/src/lib/apiClient.ts` — `apiGet`, `apiPost`, `apiPatch` with Supabase JWT auth header. Reads `NEXT_PUBLIC_API_BASE_URL` (no `/api` suffix).
+  - `apps/web/src/services/brandService.ts` — `getBrands`, `createBrand`, `updateBrand`.
+  - `apps/web/src/components/shared/AppLayout.tsx` — shared sidebar shell used by all app pages.
+  - **Session Note:** `PATCH /brands/:id` added to Express API (`updateBrand` controller + route) as it was required for settings save to work. `NEXT_PUBLIC_API_URL` in `.env.local` renamed to `NEXT_PUBLIC_API_BASE_URL` to match `apiClient.ts`.
 
 ---
 
 ##### **3.3 — Settings / Brand Config**
 
-- [ ] **Settings Layout** (`apps/web/src/app/settings/layout.tsx`)
-  - Sub-navigation tabs: **Brand config**, **Prompts**, **Competitors**.
-  - Active tab highlighted with bottom border or bold weight.
-- [ ] **Brand Config — Edit Mode** (`apps/web/src/app/settings/page.tsx`)
-  - Three labelled input fields (uppercase label above, placeholder text in `#D9D9D9`):
-    - `BRAND NAME` → input placeholder `"Brand name"`
-    - `WEBSITE` → input placeholder `"brand.com"`
-    - `INDUSTRY` → input placeholder `"Industry"`
-  - Two action buttons: `"Save"` (dark/filled) and `"Discard changes"` (ghost/outlined).
-  - On save: `POST /brands` or `PATCH /brands/:id`, then switch to view mode.
-- [ ] **Brand Config — View Mode**
-  - Same three fields rendered read-only.
-  - Each field row has an inline `✎` edit icon (pencil) that switches that field (or the whole form) to edit mode.
-  - `"Save"` and `"Back"` action buttons.
-- [ ] **Prompts Sub-Page** (`apps/web/src/app/settings/prompts/page.tsx`)
-  - Section label: `EXAMPLE PROMPT`.
-  - Helper text (uppercase, small): `"ENTER A PROMPT THAT YOU WOULD EXPECT YOUR BRAND TO BE MENTIONED FOR"`.
-  - Textarea with placeholder `"Your example prompt..."`.
-  - `"Save"` button.
-- [ ] **Competitors Sub-Page** (`apps/web/src/app/settings/competitors/page.tsx`)
-  - List of current competitors (name only, fetched from `GET /brands` competitors array).
-  - Add competitor input + button.
-  - Remove competitor (delete icon per row).
-  - Wire to `POST /brands` competitors field.
+- [x] **Settings Layout** (`apps/web/src/app/settings/layout.tsx`)
+  - Sidebar via `AppLayout` + `SettingsNav` sub-tabs (Brand config / Prompts / Competitors). Active tab uses bottom border indicator.
+- [x] **Brand Config — Create + Edit + View** (`apps/web/src/app/settings/page.tsx`)
+  - Create mode (no brand): form with BRAND NAME, WEBSITE, INDUSTRY inputs + Save.
+  - View mode (brand exists): read-only rows with `✎` edit icon per row.
+  - Edit mode: same form pre-filled + Save / Discard changes.
+  - Calls `POST /brands` (create) or `PATCH /brands/:id` (update). Success/error via `sonner` toast.
+- [x] **Prompts Sub-Page** (`apps/web/src/app/settings/prompts/page.tsx`)
+  - Textarea with "EXAMPLE PROMPT" label + uppercase helper text + Save.
+- [x] **Competitors Sub-Page** (`apps/web/src/app/settings/competitors/page.tsx`)
+  - Lists existing competitors fetched from `GET /brands`. Add (Enter or button) / Remove per row. Max 10.
+- [x] **Account Page** (`apps/web/src/app/account/`) — layout + placeholder billing form (Stripe integration pending).
+  - **Session Note:** Website field is frontend-only (not in DB schema yet). `sonner` Toaster added to root layout.
+- [x] **SettingsNav** (`apps/web/src/components/shared/SettingsNav.tsx`) — sub-tab nav for settings pages (Brand config / Prompts / Competitors). Active tab uses `border-b-4 -mb-[4px] border-foreground`.
+- [x] **Supabase Auth Seeding Fixed** — `supabase/seed.sql` rewritten to include `instance_id`, empty-string token columns, `auth.identities` rows, and `updated_at`. Removed manual `public.users` inserts (the `on_auth_user_created` trigger handles them). Seeded brand now added to the trigger-created personal org instead of a separate 'Acme Inc.' org.
+  - **Session Note:** Migration `014_apply_rls_and_move_schemas.sql` had a bug (`analysis_run_id` → `run_id` for mentions RLS policies) — fixed. `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY` must be the JWT-format `ANON_KEY` from `npx supabase status --output json`, not the `sb_publishable_*` format.
 
 ---
 
@@ -158,8 +150,9 @@
 
 ##### **3.6 — API Service Layer (Frontend)**
 
-- [ ] **Brand Service** (`apps/web/src/services/brandService.ts`)
+- [x] **Brand Service** (`apps/web/src/services/brandService.ts`)
   - `getBrand()`, `createBrand()`, `updateBrand()` — wraps Express API calls with Supabase JWT in `Authorization` header.
+  - **Session Note:** Implemented in Phase 3.2 alongside `apiClient.ts`.
 - [ ] **Analysis Service** (`apps/web/src/services/analysisService.ts`)
   - `triggerAnalysis()`, `getAnalysisRuns()`, `getMentions()` — fetches from Express API.
 - [ ] **React Query / SWR Setup**
