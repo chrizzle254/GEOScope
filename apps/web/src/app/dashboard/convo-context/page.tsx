@@ -131,11 +131,7 @@ function MentionList({
           {/* Mention cards */}
           <div className="flex flex-col gap-4">
             {mentions.map((mention, i) => (
-              <MentionCard
-                key={mention.id}
-                mention={mention}
-                index={page * PAGE_SIZE + i + 1}
-              />
+              <MentionCard key={mention.id} mention={mention} index={page * PAGE_SIZE + i + 1} />
             ))}
           </div>
 

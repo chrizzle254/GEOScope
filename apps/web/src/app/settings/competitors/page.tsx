@@ -50,7 +50,10 @@ export default function CompetitorsPage() {
     if (!brandId) return;
     setIsSaving(true);
     try {
-      const saved = await updateCompetitors(brandId, competitors.map((c) => c.name));
+      const saved = await updateCompetitors(
+        brandId,
+        competitors.map((c) => c.name),
+      );
       setCompetitors(saved);
       toast.success('Competitors saved.');
     } catch (err: unknown) {
@@ -90,7 +93,10 @@ export default function CompetitorsPage() {
           <p className="text-sm text-muted-foreground">No competitors added yet.</p>
         )}
         {competitors.map((c) => (
-          <div key={c.id} className="flex items-center justify-between border-4 border-border px-4 py-3">
+          <div
+            key={c.id}
+            className="flex items-center justify-between border-4 border-border px-4 py-3"
+          >
             <span className="text-sm text-foreground">{c.name}</span>
             <button
               type="button"

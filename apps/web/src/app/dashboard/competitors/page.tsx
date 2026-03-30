@@ -169,7 +169,10 @@ function SoVChart({
                 axisLine={{ stroke: '#757575', strokeWidth: 2 }}
                 tickLine={false}
               />
-              <Tooltip content={<SoVTooltip totalResponses={totalResponses} />} cursor={{ fill: 'rgba(0,0,0,0.04)' }} />
+              <Tooltip
+                content={<SoVTooltip totalResponses={totalResponses} />}
+                cursor={{ fill: 'rgba(0,0,0,0.04)' }}
+              />
               <Bar dataKey="share" radius={0} label={<BarLabel />}>
                 {data.map((entry) => (
                   <Cell key={entry.name} fill={entry.isBrand ? '#1E1E1E' : '#757575'} />

@@ -34,7 +34,10 @@ export function LoginForm() {
   return (
     <form onSubmit={handleLogin} className="flex flex-col gap-5" noValidate>
       <div className="flex flex-col gap-1">
-        <label htmlFor="email" className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+        <label
+          htmlFor="email"
+          className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground"
+        >
           Email
         </label>
         <Input
@@ -50,7 +53,10 @@ export function LoginForm() {
 
       <div className="flex flex-col gap-1">
         <div className="flex items-center justify-between">
-          <label htmlFor="password" className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+          <label
+            htmlFor="password"
+            className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground"
+          >
             Password
           </label>
           <Link
@@ -70,9 +76,7 @@ export function LoginForm() {
         />
       </div>
 
-      {error && (
-        <p className="border-4 border-destructive p-3 text-xs text-destructive">{error}</p>
-      )}
+      {error && <p className="border-4 border-destructive p-3 text-xs text-destructive">{error}</p>}
 
       <Button type="submit" className="w-full" disabled={isLoading}>
         {isLoading ? 'Logging in...' : 'Login'}

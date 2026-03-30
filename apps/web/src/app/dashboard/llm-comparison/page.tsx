@@ -137,7 +137,12 @@ function ComparisonChart({ stats, run }: { stats: LLMProviderStats[]; run: Analy
             <BarChart data={chartData} margin={{ top: 4, right: 0, left: -10, bottom: 0 }}>
               <XAxis
                 dataKey="label"
-                tick={{ fontFamily: 'Roboto Mono, monospace', fontSize: 10, fontWeight: 700, fill: '#757575' }}
+                tick={{
+                  fontFamily: 'Roboto Mono, monospace',
+                  fontSize: 10,
+                  fontWeight: 700,
+                  fill: '#757575',
+                }}
                 axisLine={{ stroke: '#757575', strokeWidth: 2 }}
                 tickLine={false}
               />

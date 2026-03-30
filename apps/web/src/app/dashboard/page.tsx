@@ -105,9 +105,7 @@ function BrandOverview({ brand }: { brand: Brand }) {
           Your brand
         </p>
         <h2 className="text-2xl font-bold text-foreground">{brand.name}</h2>
-        {brand.industry && (
-          <p className="mt-1 text-sm text-muted-foreground">{brand.industry}</p>
-        )}
+        {brand.industry && <p className="mt-1 text-sm text-muted-foreground">{brand.industry}</p>}
         {brand.competitors.length > 0 && (
           <div className="mt-4 flex flex-wrap gap-2">
             {brand.competitors.map((c) => (

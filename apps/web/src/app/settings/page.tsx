@@ -26,7 +26,11 @@ export default function BrandConfigPage() {
         const existing = brands[0] ?? null;
         setBrand(existing);
         if (existing) {
-          setForm({ name: existing.name, website: existing.website ?? '', industry: existing.industry });
+          setForm({
+            name: existing.name,
+            website: existing.website ?? '',
+            industry: existing.industry,
+          });
         } else {
           // No brand yet — start in edit/create mode
           setIsEditing(true);
@@ -49,7 +53,11 @@ export default function BrandConfigPage() {
         setBrand(updated);
         toast.success('Brand updated.');
       } else {
-        const created = await createBrand({ name: form.name, industry: form.industry, competitors: [] });
+        const created = await createBrand({
+          name: form.name,
+          industry: form.industry,
+          competitors: [],
+        });
         setBrand(created);
         toast.success('Brand created.');
       }
@@ -79,7 +87,16 @@ export default function BrandConfigPage() {
   }
 
   if (isEditing || !brand) {
-    return <EditForm form={form} setForm={setForm} brand={brand} isSaving={isSaving} onSave={handleSave} onDiscard={handleDiscard} />;
+    return (
+      <EditForm
+        form={form}
+        setForm={setForm}
+        brand={brand}
+        isSaving={isSaving}
+        onSave={handleSave}
+        onDiscard={handleDiscard}
+      />
+    );
   }
 
   return <ViewMode brand={brand} form={form} onEdit={() => setIsEditing(true)} />;

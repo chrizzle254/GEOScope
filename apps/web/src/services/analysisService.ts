@@ -8,7 +8,9 @@ export interface TriggerAnalysisInput {
   models?: string[];
 }
 
-export async function triggerAnalysis(input: TriggerAnalysisInput): Promise<{ analysisId: string }> {
+export async function triggerAnalysis(
+  input: TriggerAnalysisInput,
+): Promise<{ analysisId: string }> {
   return apiPost<{ analysisId: string }>('/api/v1/analyses', input);
 }
 

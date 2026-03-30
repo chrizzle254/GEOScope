@@ -16,10 +16,7 @@ export async function updateBrand(
   return apiPatch<Brand>(`/brands/${id}`, input);
 }
 
-export async function updateCompetitors(
-  id: string,
-  competitors: string[],
-): Promise<Competitor[]> {
+export async function updateCompetitors(id: string, competitors: string[]): Promise<Competitor[]> {
   const result = await apiPatch<{ competitors: Competitor[] }>(`/brands/${id}/competitors`, {
     competitors,
   });
