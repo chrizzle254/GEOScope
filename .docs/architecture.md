@@ -78,13 +78,13 @@ api/
 
 ### 4.3 API Routes
 
-| Method | Path | Auth | Description |
-|--------|------|------|-------------|
-| GET | `/health` | — | Health check |
-| GET | `/brands` | JWT | List reporting subjects for the user's org |
-| POST | `/brands` | JWT | Create a new reporting subject + competitors |
-| PATCH | `/brands/:id` | JWT | Update brand name/industry |
-| POST | `/api/v1/analyses` | JWT | Trigger a sampling analysis run |
+| Method | Path               | Auth | Description                                  |
+| ------ | ------------------ | ---- | -------------------------------------------- |
+| GET    | `/health`          | —    | Health check                                 |
+| GET    | `/brands`          | JWT  | List reporting subjects for the user's org   |
+| POST   | `/brands`          | JWT  | Create a new reporting subject + competitors |
+| PATCH  | `/brands/:id`      | JWT  | Update brand name/industry                   |
+| POST   | `/api/v1/analyses` | JWT  | Trigger a sampling analysis run              |
 
 ## 5. Data Schema
 

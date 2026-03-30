@@ -1,4 +1,5 @@
 Read the project documentation for GEO Scope:
+
 - @tasks.md
 - @.docs/prd.md
 - @.docs/architecture.md
