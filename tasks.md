@@ -16,6 +16,7 @@
   - [x] Setup DB schema (with migration files)
 - [x] **Auth**
   - [x] Protect routes with middleware
+    - **Session Note (CHR-25):** Created `apps/web/src/middleware.ts` — was missing entirely. Uses `@supabase/ssr` to check session server-side. Protects `/dashboard`, `/settings`, `/account`. Redirects unauthenticated users to `/auth/login?next=<path>`. Commit: `927d235`.
   - [x] Add auth routes (login, register, reset passwords)
 
 ---
@@ -40,6 +41,7 @@
 - [x] **The "Blind" Prompt Library**
   - Create `apps/api/src/lib/prompts.ts` with ~100 industry-specific questions.
   - **Rule:** These prompts must NOT mention the User's Brand.
+  - **Session Note (CHR-22):** Expanded `supabase/seed.sql` from 15 → 60 prompt templates across 13 industry categories. Table is `internal.prompts` (not `internal.prompt_templates` as in ticket). Commit: `927d235`.
 - [x] **Mention Extraction Parser**
   - **Session Note:** Implemented a Regex-based `MentionParser` using TDD. The `samplingEngine` was refactored to use this parser and persist results to a newly defined `public.mentions` schema.
 - [x] **Data Persistence**
