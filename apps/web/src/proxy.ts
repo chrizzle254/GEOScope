@@ -1,12 +1,37 @@
 import { createClient } from '@/lib/supabase/middleware';
-import { type NextRequest } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
+
+// Routes that require authentication
+const PROTECTED_ROUTES = ['/dashboard', '/settings', '/account'];
+
+// Routes that should redirect to dashboard if already authenticated
+const AUTH_ROUTES = ['/auth/login', '/auth/sign-up'];
 
 export async function proxy(request: NextRequest) {
   const { supabase, response } = createClient(request);
 
   // Refresh session if expired - required for Server Components
   // https://supabase.com/docs/guides/auth/auth-helpers/nextjs#managing-session-with-middleware
-  await supabase.auth.getSession();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const { pathname } = request.nextUrl;
+
+  const isProtectedRoute = PROTECTED_ROUTES.some((route) => pathname.startsWith(route));
+  const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route));
+
+  // Redirect unauthenticated users away from protected routes
+  if (isProtectedRoute && !user) {
+    const redirectUrl = new URL('/auth/login', request.url);
+    redirectUrl.searchParams.set('next', pathname);
+    return NextResponse.redirect(redirectUrl);
+  }
+
+  // Redirect authenticated users away from auth pages
+  if (isAuthRoute && user) {
+    return NextResponse.redirect(new URL('/dashboard', request.url));
+  }
 
   return response;
 }
