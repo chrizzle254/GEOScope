@@ -28,7 +28,7 @@ export async function generateAnalysisPrompts(
   context: BrandContext,
   targetCount = 100,
 ): Promise<GeneratedPrompt[]> {
-  const { brandName: _brandName, industry, targetAudience, competitors } = context;
+  const { industry, targetAudience, competitors } = context;
 
   // Build the meta-prompt — ask LLM to generate questions about the space,
   // WITHOUT mentioning the user's specific brand by name.
@@ -80,7 +80,9 @@ function parseGeneratedPrompts(raw: string, targetCount: number): GeneratedPromp
     // Attempt to extract JSON array from anywhere in the response
     const match = cleaned.match(/\[[\s\S]*\]/);
     if (!match) {
-      throw new Error(`promptGenerator: LLM returned non-parseable output. Raw: ${raw.slice(0, 200)}`);
+      throw new Error(
+        `promptGenerator: LLM returned non-parseable output. Raw: ${raw.slice(0, 200)}`,
+      );
     }
     try {
       parsed = JSON.parse(match[0]);

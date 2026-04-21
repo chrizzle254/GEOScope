@@ -25,10 +25,10 @@ async function testApp() {
     console.log('2️⃣  Checking for auth buttons...');
     const loginBtn = page.locator('text=Log in');
     const signupBtn = page.locator('text=Sign up');
-    if (await loginBtn.count() > 0) {
+    if ((await loginBtn.count()) > 0) {
       console.log('   ✅ Login button found');
     }
-    if (await signupBtn.count() > 0) {
+    if ((await signupBtn.count()) > 0) {
       console.log('   ✅ Sign up button found\n');
     }
 
@@ -42,14 +42,14 @@ async function testApp() {
     console.log('4️⃣  Checking form elements...');
     const emailInput = page.locator('input[type="email"]');
     const passwordInput = page.locator('input[type="password"]');
-    console.log(`   Email field: ${await emailInput.count() > 0 ? '✅' : '❌'}`);
-    console.log(`   Password field: ${await passwordInput.count() > 0 ? '✅' : '❌'}\n`);
+    console.log(`   Email field: ${(await emailInput.count()) > 0 ? '✅' : '❌'}`);
+    console.log(`   Password field: ${(await passwordInput.count()) > 0 ? '✅' : '❌'}\n`);
 
     // 5. Check dashboard page (if accessible)
     console.log('5️⃣  Checking dashboard...');
     await page.goto('http://localhost:3000/dashboard', { waitUntil: 'networkidle' });
     const dashboardTitle = page.locator('text=Dashboard');
-    if (await dashboardTitle.count() > 0) {
+    if ((await dashboardTitle.count()) > 0) {
       await page.screenshot({ path: `${screenshotsDir}/03-dashboard.png` });
       console.log('   ✅ Dashboard loaded. Screenshot: 03-dashboard.png\n');
     } else {
@@ -60,7 +60,7 @@ async function testApp() {
     console.log('6️⃣  Checking settings page...');
     await page.goto('http://localhost:3000/settings', { waitUntil: 'networkidle' });
     const settingsTitle = page.locator('text=Settings');
-    if (await settingsTitle.count() > 0) {
+    if ((await settingsTitle.count()) > 0) {
       await page.screenshot({ path: `${screenshotsDir}/04-settings.png` });
       console.log('   ✅ Settings page loaded. Screenshot: 04-settings.png\n');
     } else {
@@ -82,7 +82,6 @@ async function testApp() {
     console.log('- Check if all pages load without errors');
     console.log('- Verify forms are functional');
     console.log('- Check auth flows');
-
   } catch (error) {
     console.error('❌ Error during test:', error.message);
   } finally {

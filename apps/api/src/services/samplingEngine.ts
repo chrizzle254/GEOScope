@@ -6,12 +6,7 @@ import pLimit from 'p-limit';
 import { supabaseAdmin } from '../lib/supabase';
 import { MentionParser } from './mentionParser';
 import { generateAnalysisPrompts, GeneratedPrompt } from './promptGenerator';
-import {
-  SupportedModel,
-  LLMProvider,
-  ParseOptions,
-  MentionResult,
-} from '@geoscope/shared/types';
+import { SupportedModel, LLMProvider, ParseOptions, MentionResult } from '@geoscope/shared/types';
 import type { LanguageModel } from 'ai';
 
 // Restrict concurrency to 10 simultaneous LLM calls
@@ -22,7 +17,6 @@ export interface AnalysisOptions {
   organizationId: string;
   models: SupportedModel[];
 }
-
 
 /**
  * Runs a blind share-of-voice analysis across multiple LLM providers.
@@ -116,15 +110,15 @@ export async function runAnalysis(analysisId: string, options: AnalysisOptions) 
     console.log(`[runAnalysis] Brand: ${brand.name}, industry: ${brand.industry}`);
 
     // 2. Dynamically generate analysis prompts via LLM (brand-blind)
-    console.log(`[runAnalysis] Generating analysis prompts for brand: ${brand.name} (${brand.industry})`);
+    console.log(
+      `[runAnalysis] Generating analysis prompts for brand: ${brand.name} (${brand.industry})`,
+    );
     const prompts: GeneratedPrompt[] = await generateAnalysisPrompts(
       {
         brandName: brand.name,
         industry: brand.industry || 'general',
         targetAudience: brand.target_audience || 'consumers',
-        competitors: brand.reporting_subject_competitors.map(
-          (c: { name: string }) => c.name,
-        ),
+        competitors: brand.reporting_subject_competitors.map((c: { name: string }) => c.name),
       },
       100,
     );
