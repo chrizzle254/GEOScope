@@ -5,14 +5,8 @@ import { google } from '@ai-sdk/google';
 import pLimit from 'p-limit';
 import { supabaseAdmin } from '../lib/supabase';
 import { MentionParser } from './mentionParser';
-import {
-  SupportedModel,
-  LLMProvider,
-  Prompt,
-  TemplateData,
-  ParseOptions,
-  MentionResult,
-} from '@geoscope/shared/types';
+import { generateAnalysisPrompts, GeneratedPrompt } from './promptGenerator';
+import { SupportedModel, LLMProvider, ParseOptions, MentionResult } from '@geoscope/shared/types';
 import type { LanguageModel } from 'ai';
 
 // Restrict concurrency to 10 simultaneous LLM calls
@@ -22,35 +16,6 @@ export interface AnalysisOptions {
   reportingSubjectId: string;
   organizationId: string;
   models: SupportedModel[];
-}
-
-/**
- * Fill template placeholders with actual brand data
- */
-function fillTemplate(template: string, data: TemplateData): string {
-  if (!template || template.trim() === '') {
-    throw new Error('Template text is empty or undefined');
-  }
-
-  let filled = template;
-
-  Object.entries(data).forEach(([key, value]) => {
-    if (value) {
-      const placeholder = new RegExp(`{{${key}}}`, 'g');
-      filled = filled.replace(placeholder, value);
-    }
-  });
-
-  // Remove any unfilled placeholders
-  filled = filled.replace(/{{[^}]+}}/g, '').trim();
-
-  // Ensure we still have content after processing
-  if (!filled || filled === '') {
-    console.warn(`Template resulted in empty string. Original: "${template}"`);
-    return template; // Return original if processing resulted in empty string
-  }
-
-  return filled;
 }
 
 /**
@@ -68,31 +33,31 @@ async function persistTaskError(runId: string, promptId: string, modelId: string
     `[persistTaskError] Logging failure for run ${runId}, prompt ${promptId}, model ${modelId}:`,
     error.message,
   );
-  // Use the existing RPC to log the error
+  // Log the error as a response entry (prompt_id is nullable for generated prompts)
   await supabaseAdmin.rpc('insert_llm_response', {
     p_analysis_run_id: runId,
     p_provider: modelId,
-    p_prompt_id: promptId,
+    p_prompt_id: null,
     p_response_text: `Task Error: ${error.message}`,
-    p_is_error: true, // Assuming the RPC function is designed to handle this parameter
   });
 }
 
 async function persistTaskSuccess(
   runId: string,
-  promptId: string,
+  promptId: string | null,
   modelId: string,
   rawResponse: string,
   mentionData: MentionResult,
 ) {
   // 1. Insert into internal.llm_responses via the existing RPC function
+  // prompt_id is nullable — generated prompts have no DB UUID
   const { data: responseId, error: responseLogError } = await supabaseAdmin.rpc(
     'insert_llm_response',
     {
       p_analysis_run_id: runId,
       p_provider: modelId,
       p_response_text: rawResponse,
-      p_prompt_id: promptId,
+      p_prompt_id: null,
     },
   );
 
@@ -142,25 +107,25 @@ export async function runAnalysis(analysisId: string, options: AnalysisOptions) 
       throw new Error(`Brand not found: ${brandError?.message}`);
     }
 
-    // Prepare template data
-    const templateData: TemplateData = {
-      brand_name: brand.name,
-      industry: brand.industry || 'general',
-      target_audience: brand.target_audience || 'consumers',
-      competitor_1: brand.reporting_subject_competitors[0]?.name,
-      competitor_2: brand.reporting_subject_competitors[1]?.name,
-      competitor_3: brand.reporting_subject_competitors[2]?.name,
-    };
+    console.log(`[runAnalysis] Brand: ${brand.name}, industry: ${brand.industry}`);
 
-    console.log(`[runAnalysis] Prepared template data:`, templateData);
-
-    // 2. Load System Prompts from the database via RPC (internal schema)
-    const { data: prompts, error: promptsError } = await supabaseAdmin.rpc('get_internal_prompts');
-    if (promptsError) throw promptsError;
+    // 2. Dynamically generate analysis prompts via LLM (brand-blind)
+    console.log(
+      `[runAnalysis] Generating analysis prompts for brand: ${brand.name} (${brand.industry})`,
+    );
+    const prompts: GeneratedPrompt[] = await generateAnalysisPrompts(
+      {
+        brandName: brand.name,
+        industry: brand.industry || 'general',
+        targetAudience: brand.target_audience || 'consumers',
+        competitors: brand.reporting_subject_competitors.map((c: { name: string }) => c.name),
+      },
+      100,
+    );
     if (!prompts || prompts.length === 0) {
-      throw new Error('No system prompts found in the database.');
+      throw new Error('Prompt generator returned no prompts.');
     }
-    console.log(`[runAnalysis] Loaded ${prompts.length} prompts`);
+    console.log(`[runAnalysis] Generated ${prompts.length} analysis prompts`);
 
     // 3. Fetch provider details from database
     const { data: providers, error: providersError } = await supabaseAdmin.rpc('get_llm_providers');
@@ -213,16 +178,16 @@ export async function runAnalysis(analysisId: string, options: AnalysisOptions) 
       `[runAnalysis] Creating task queue: ${prompts.length} prompts × ${models.length} models = ${prompts.length * models.length} total tasks`,
     );
 
-    const tasks = prompts.flatMap((promptDoc: Prompt) =>
+    const tasks = prompts.flatMap((promptDoc: GeneratedPrompt) =>
       models.map((model: ModelInstance) =>
         limit(async () => {
           try {
-            const filledPrompt = fillTemplate(promptDoc.template_text, templateData);
+            // Generated prompts are already fully formed — no template filling needed
             console.log(`[runAnalysis] Calling ${model.id} for prompt ${promptDoc.id}`);
 
             const { text } = await generateText({
               model: model.instance,
-              messages: [{ role: 'user', content: filledPrompt }],
+              messages: [{ role: 'user', content: promptDoc.text }],
             });
             console.log(
               `[runAnalysis] ${model.id} responded for prompt ${promptDoc.id}, length: ${text.length}`,

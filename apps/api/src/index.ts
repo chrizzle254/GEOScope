@@ -2,7 +2,12 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import { env } from './env';
 import { authenticateUser } from './middleware/auth';
-import { getBrands, createBrand } from './controllers/brandController';
+import {
+  getBrands,
+  createBrand,
+  updateBrand,
+  updateCompetitors,
+} from './controllers/brandController';
 import { supabaseAdmin } from './lib/supabase';
 import analysisRoutes from './routes/analysisRoutes';
 
@@ -21,6 +26,8 @@ app.use('/api/v1/analyses', analysisRoutes);
 // --- Brand Routes ---
 app.get('/brands', authenticateUser, getBrands);
 app.post('/brands', authenticateUser, createBrand);
+app.patch('/brands/:id', authenticateUser, updateBrand);
+app.patch('/brands/:id/competitors', authenticateUser, updateCompetitors);
 // --- End Brand Routes ---
 
 // Protected: Get current user profile

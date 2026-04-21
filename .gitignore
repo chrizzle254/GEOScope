@@ -26,3 +26,9 @@ apps/*/.env.production.local
 
 # DB
 supabase/.temp
+
+# Test / CI artifacts
+.playwright-mcp/
+*.tsbuildinfo
+test-*.png
+test-*.jpg
